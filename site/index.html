@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bordeom — Steven's Boredom Projects</title>
+<style>
+  :root{--ink:#f2eef8;--dim:#b9aed0;--card:#1d1830;--line:#372d55;--accent:#ffb54d;--accent2:#7ee0c2}
+  *{box-sizing:border-box}
+  body{margin:0;background:#120e22;color:var(--ink);font:16px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:34px 18px 8px;text-align:center}
+  h1{margin:0;font-size:42px;letter-spacing:3px}
+  .sub{color:var(--dim);margin:8px auto 4px;max-width:640px}
+  .wrap{max-width:880px;margin:0 auto;padding:10px 16px 30px}
+  h2{font-size:19px;letter-spacing:1px;color:var(--accent);margin:28px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  h2.green{color:var(--accent2)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+  .card h3{margin:0;font-size:19px}
+  .file{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--dim)}
+  .card p{margin:0;color:var(--dim);font-size:14.5px;flex:1}
+  .btn{display:inline-block;text-align:center;background:var(--accent);color:#241703;font-weight:700;text-decoration:none;padding:10px 14px;border-radius:10px}
+  .btn.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2)}
+  .chip{align-self:flex-start;font-size:12px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:999px;background:#2c2350;color:var(--dim);border:1px solid var(--line)}
+  .chip.soon{color:var(--accent);border-color:var(--accent)}
+  footer{text-align:center;color:var(--dim);font-size:13px;padding:6px 14px 30px;max-width:680px;margin:0 auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>BORDEOM</h1>
+  <p class="sub">Steven's boredom projects — little programs built for the fun of it, now out where they belong. If it's on this page, it was made because the alternative was staring at a wall.</p>
+</header>
+<div class="wrap">
+
+  <h2 class="green">OUT NOW</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Called It Fair — Scoreboards</h3>
+      <span class="chip">LIVE</span>
+      <p>Live standings and averages from public data: baseball at every level from MLB down to the Toledo Mud Hens, plus football, college football, basketball, college basketball, hockey, and soccer. Born as a dugout toy for the essay "You Called It Fair, Pop."</p>
+      <a class="btn" href="https://caeled.github.io/called-it-fair-scoreboard/">Open the scoreboards</a>
+      <a class="btn ghost" href="https://github.com/caeled/called-it-fair-scoreboard">The code</a>
+    </div>
+    <div class="card">
+      <h3>Gym Companion</h3>
+      <span class="chip">GOES LIVE WITH THIS PAGE</span>
+      <p>A field guide to Steven's Planet Fitness routine, built from his own photos shot mid-workout: all 15 machines, the training videos decoded out of their placard QR codes, and a daily check-off board. Core, chest, back, arms, hips, legs — the whole circuit.</p>
+      <a class="btn" href="gym-companion.html">Open the gym companion</a>
+    </div>
+  </div>
+
+  <h2>THE ORIGINAL SHELF — SEPTEMBER 19, 2026</h2>
+  <p style="color:var(--dim);margin:0 0 12px">Four nostalgic programs from the big build day: what a 1990s DOS toy looks like today. Each is a single Python file with its own self-test. The files came over on Nov 5, 2026 and every self-test passes — three of the four are below; the bouncing line is still on Steven's machine.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Acidwarp Tribute</h3>
+      <div class="file">warp.py · 15 self-test checks · numpy + pygame</div>
+      <span class="chip">IN THE COLLECTION · SELF-TEST PASSED</span>
+      <p>Draw one picture of palette-index numbers from maths — rings, spirals, waves, plasma, kaleidoscope, tunnel, a Julia fractal — then rotate the colour palette every frame so the colours flow through the shapes. Fade, new picture, repeat.</p>
+      <a class="btn ghost" href="programs/warp.py" download>Download warp.py</a>
+    </div>
+    <div class="card">
+      <h3>Bouncing Line</h3>
+      <div class="file">bounce.py · 17 self-test checks · numpy + pygame</div>
+      <span class="chip soon">STILL ON STEVEN'S MACHINE</span>
+      <p>A line bouncing off all four walls with a fading trail. After a random wait, the next bounce is special: one line splits into two to four, and several lines kill the one that bounced. A remake of Steven's seventh-grade first program. It didn't come over in the Nov 5 handover — its card is saved for it.</p>
+    </div>
+    <div class="card">
+      <h3>Mandelbrot Zoomer</h3>
+      <div class="file">fractal.py · 12 self-test checks · numpy + pygame</div>
+      <span class="chip">IN THE COLLECTION · SELF-TEST PASSED</span>
+      <p>A Mandelbrot/Julia zoomer with colour cycling. Starts as a screensaver dive into the spiral valleys; click to explore. A full 320x200 frame takes about 12 milliseconds — it needed a maths coprocessor in the 1980s.</p>
+      <a class="btn ghost" href="programs/fractal.py" download>Download fractal.py</a>
+    </div>
+    <div class="card">
+      <h3>Morse Code Tool</h3>
+      <div class="file">morse.py · 19 self-test checks · also MorseCode.exe (23 MB)</div>
+      <span class="chip">IN THE COLLECTION · SELF-TEST PASSED</span>
+      <p>Type text, hear Morse code. Speed, tone, repeat count, Farnsworth spacing, hide-and-reveal for learning by ear, and save as WAV. Made for Steven's father, a ham radio operator since 1956; the exe was built for the ham club.</p>
+      <a class="btn ghost" href="programs/morse.py" download>Download morse.py</a>
+      <a class="btn" href="programs/MorseCode.exe" download>Download MorseCode.exe — no Python needed</a>
+    </div>
+  </div>
+
+  <h2>ADDED LATER</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Pocket Orbit</h3>
+      <div class="file">surprise.py · added Oct 11, 2026 · pure standard library, nothing to install</div>
+      <span class="chip">IN THE COLLECTION · SELF-TEST PASSED</span>
+      <p>The fifth Bordeom program, and the quiet one: a hypotrochoid curve drawn live in a window titled "Bordeom — Pocket Orbit." Another orbit whenever you ask, and any orbit can be saved as SVG artwork. Double-click Surprise.cmd on Windows, or just run the file.</p>
+      <a class="btn ghost" href="programs/surprise.py" download>Download surprise.py</a>
+      <a class="btn ghost" href="programs/Surprise.cmd" download>Download Surprise.cmd launcher</a>
+    </div>
+    <div class="card">
+      <h3>Bordeom Clock</h3>
+      <div class="file">clock.html · added Nov 8, 2026 · runs right in the browser</div>
+      <span class="chip">GOES LIVE WITH THIS PAGE</span>
+      <p>A big honest clock, alarms you can set and save, and a countdown timer — the clocktab job, done Bordeom-style. Alarms are saved in the browser and stay put between visits; the beep is made by the page itself, no sound files.</p>
+      <a class="btn" href="clock.html">Open the clock</a>
+    </div>
+  </div>
+
+</div>
+<footer>Bordeom began on September 19, 2026. New toys get added when boredom strikes and something gets built instead.</footer>
+</body>
+</html>

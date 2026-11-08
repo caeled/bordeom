@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bordeom Clock — Clock, Alarms &amp; Timer</title>
+<style>
+  :root{--ink:#f2eef8;--dim:#b9aed0;--card:#1d1830;--line:#372d55;--accent:#ffb54d;--accent2:#7ee0c2;--danger:#ff7a7a}
+  *{box-sizing:border-box}
+  body{margin:0;background:#120e22;color:var(--ink);font:16px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:28px 18px 4px;text-align:center}
+  h1{margin:0;font-size:30px;letter-spacing:2px}
+  header a{color:var(--accent2);text-decoration:none;font-size:14px}
+  .wrap{max-width:760px;margin:0 auto;padding:10px 16px 40px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:18px}
+  .panel h2{margin:0 0 12px;font-size:17px;letter-spacing:1px;color:var(--accent)}
+  .panel h2.green{color:var(--accent2)}
+  #clockTime{font:700 84px/1.05 ui-monospace,Menlo,Consolas,monospace;text-align:center;letter-spacing:2px}
+  #clockDate{text-align:center;color:var(--dim);font-size:19px;margin-top:6px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row.center{justify-content:center}
+  input[type="time"],input[type="text"],input[type="number"]{background:#120e22;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:16px}
+  input[type="number"]{width:84px}
+  button{background:var(--accent);color:#241703;font-weight:700;border:0;padding:10px 16px;border-radius:10px;font-size:15px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent2);border:1px solid var(--accent2)}
+  button.small{padding:6px 11px;font-size:13.5px}
+  button.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+  .alarm{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;padding:10px 14px;margin-top:10px}
+  .alarm .at{font:700 26px ui-monospace,Menlo,Consolas,monospace}
+  .alarm .al{color:var(--dim);flex:1;word-break:break-word}
+  .alarm.off{opacity:.45}
+  .switch{position:relative;width:48px;height:26px;flex:none}
+  .switch input{opacity:0;width:0;height:0}
+  .track{position:absolute;inset:0;background:#2c2350;border:1px solid var(--line);border-radius:999px;cursor:pointer;transition:.15s}
+  .track:before{content:"";position:absolute;left:3px;top:2px;width:19px;height:19px;border-radius:50%;background:var(--dim);transition:.15s}
+  .switch input:checked + .track{background:#3d6b5c}
+  .switch input:checked + .track:before{transform:translateX(22px);background:var(--accent2)}
+  #timerReadout{font:700 64px/1.05 ui-monospace,Menlo,Consolas,monospace;text-align:center}
+  #banner{display:none;margin-top:18px;background:#4a2b12;border:1px solid var(--accent);border-radius:14px;padding:18px;text-align:center}
+  #banner.show{display:block}
+  #banner .bt{font-size:24px;font-weight:700;color:var(--accent)}
+  #banner .bl{color:var(--ink);margin:6px 0 12px}
+  .hint{color:var(--dim);font-size:13.5px;margin-top:10px}
+  .empty{color:var(--dim);margin-top:8px}
+  label.fmt{color:var(--dim);font-size:14px;cursor:pointer}
+  @media (max-width:560px){#clockTime{font-size:56px}#timerReadout{font-size:44px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>BORDEOM CLOCK</h1>
+  <a href="index.html">&larr; back to the Bordeom shelf</a>
+</header>
+<div class="wrap">
+
+  <div id="banner">
+    <div class="bt" id="bannerTitle">ALARM</div>
+    <div class="bl" id="bannerLabel"></div>
+    <div class="row center">
+      <button id="bannerSnooze" class="ghost">Snooze 5 min</button>
+      <button id="bannerDismiss">Dismiss</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div id="clockTime">--:--:--</div>
+    <div id="clockDate"></div>
+    <div class="row center" style="margin-top:12px">
+      <label class="fmt"><input type="checkbox" id="fmt24"> 24-hour</label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>ALARMS</h2>
+    <div class="row">
+      <input type="time" id="alarmTime">
+      <input type="text" id="alarmLabel" placeholder="Label (optional)" maxlength="60" style="flex:1;min-width:150px">
+      <button id="alarmAdd">Add alarm</button>
+    </div>
+    <div id="alarmList"></div>
+    <p class="hint">Alarms are saved in this browser and stay put between visits. Sound needs one click anywhere on the page first — that is a browser rule, not a Bordeom rule.</p>
+  </div>
+
+  <div class="panel">
+    <h2 class="green">TIMER</h2>
+    <div id="timerReadout">00:00:00</div>
+    <div class="row center" style="margin-top:14px">
+      <input type="number" id="tH" min="0" max="99" value="0" aria-label="Hours">
+      <span>h</span>
+      <input type="number" id="tM" min="0" max="59" value="5" aria-label="Minutes">
+      <span>m</span>
+      <input type="number" id="tS" min="0" max="59" value="0" aria-label="Seconds">
+      <span>s</span>
+    </div>
+    <div class="row center" style="margin-top:14px">
+      <button id="timerStart">Start</button>
+      <button id="timerPause" class="ghost">Pause</button>
+      <button id="timerReset" class="ghost">Reset</button>
+    </div>
+  </div>
+
+</div>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- sound (WebAudio beeper, no files) ---------- */
+  var actx = null, beepTimer = null;
+  function ensureAudio(){
+    if(!actx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) actx = new AC();
+    }
+    if(actx && actx.state === "suspended") actx.resume();
+  }
+  document.addEventListener("pointerdown", ensureAudio);
+  document.addEventListener("keydown", ensureAudio);
+  function beep(){
+    if(!actx) return;
+    var t = actx.currentTime;
+    [0, 0.35].forEach(function(off){
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = "sine"; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, t + off);
+      g.gain.exponentialRampToValueAtTime(0.35, t + off + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + off + 0.25);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t + off); o.stop(t + off + 0.3);
+    });
+  }
+  function startRinging(){ stopRinging(); beep(); beepTimer = setInterval(beep, 1200); }
+  function stopRinging(){ if(beepTimer){ clearInterval(beepTimer); beepTimer = null; } }
+
+  /* ---------- banner ---------- */
+  var bannerFor = null; // {type:"alarm", id:...} or {type:"timer"}
+  function showBanner(title, label, canSnooze, payload){
+    $("bannerTitle").textContent = title;
+    $("bannerLabel").textContent = label || "";
+    $("bannerSnooze").style.display = canSnooze ? "" : "none";
+    bannerFor = payload;
+    $("banner").className = "show";
+    startRinging();
+  }
+  function hideBanner(){
+    $("banner").className = "";
+    bannerFor = null;
+    stopRinging();
+  }
+  $("bannerDismiss").addEventListener("click", function(){ ensureAudio(); hideBanner(); });
+  $("bannerSnooze").addEventListener("click", function(){
+    ensureAudio();
+    if(bannerFor && bannerFor.type === "alarm"){
+      var a = findAlarm(bannerFor.id);
+      if(a){ a.snoozeUntil = Date.now() + 5*60*1000; a.firedKey = null; saveAlarms(); renderAlarms(); }
+    }
+    hideBanner();
+  });
+
+  /* ---------- clock ---------- */
+  var DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function tickClock(){
+    var now = new Date();
+    var h = now.getHours(), s = pad(now.getSeconds()), m = pad(now.getMinutes());
+    var shown;
+    if($("fmt24").checked){ shown = pad(h) + ":" + m + ":" + s; }
+    else {
+      var ap = h >= 12 ? "PM" : "AM";
+      var h12 = h % 12; if(h12 === 0) h12 = 12;
+      shown = h12 + ":" + m + ":" + s + " " + ap;
+    }
+    $("clockTime").textContent = shown;
+    $("clockDate").textContent = DAYS[now.getDay()] + ", " + MONTHS[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear();
+  }
+
+  /* ---------- alarms (saved in localStorage) ---------- */
+  var KEY = "bordeom-clock-alarms";
+  var alarms = [];
+  try { alarms = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch(e){ alarms = []; }
+  if(!Array.isArray(alarms)) alarms = [];
+  function saveAlarms(){ try { localStorage.setItem(KEY, JSON.stringify(alarms)); } catch(e){} }
+  function findAlarm(id){ for(var i = 0; i < alarms.length; i++) if(alarms[i].id === id) return alarms[i]; return null; }
+  function fmtAlarmTime(t){
+    var p = t.split(":"), h = parseInt(p[0], 10), m = p[1];
+    var ap = h >= 12 ? "PM" : "AM"; var h12 = h % 12; if(h12 === 0) h12 = 12;
+    return h12 + ":" + m + " " + ap;
+  }
+  function renderAlarms(){
+    var list = $("alarmList"); list.innerHTML = "";
+    if(alarms.length === 0){
+      var d = document.createElement("div"); d.className = "empty"; d.textContent = "No alarms yet.";
+      list.appendChild(d); return;
+    }
+    alarms.slice().sort(function(a,b){ return a.time < b.time ? -1 : 1; }).forEach(function(a){
+      var row = document.createElement("div"); row.className = "alarm" + (a.on ? "" : " off");
+      var at = document.createElement("div"); at.className = "at"; at.textContent = fmtAlarmTime(a.time);
+      var al = document.createElement("div"); al.className = "al"; al.textContent = a.label || "";
+      var sw = document.createElement("label"); sw.className = "switch";
+      var cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!a.on;
+      cb.addEventListener("change", function(){ a.on = cb.checked; a.firedKey = null; saveAlarms(); renderAlarms(); });
+      var tr = document.createElement("span"); tr.className = "track";
+      sw.appendChild(cb); sw.appendChild(tr);
+      var del = document.createElement("button"); del.className = "danger small"; del.textContent = "Delete";
+      del.addEventListener("click", function(){
+        alarms = alarms.filter(function(x){ return x.id !== a.id; });
+        saveAlarms(); renderAlarms();
+      });
+      row.appendChild(at); row.appendChild(al); row.appendChild(sw); row.appendChild(del);
+      list.appendChild(row);
+    });
+  }
+  $("alarmAdd").addEventListener("click", function(){
+    ensureAudio();
+    var t = $("alarmTime").value;
+    if(!t){ $("alarmTime").focus(); return; }
+    alarms.push({ id: "a" + Date.now(), time: t, label: $("alarmLabel").value.trim(), on: true, firedKey: null, snoozeUntil: null });
+    $("alarmLabel").value = "";
+    saveAlarms(); renderAlarms();
+  });
+  function checkAlarms(){
+    var now = new Date();
+    var key = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+    var cur = pad(now.getHours()) + ":" + pad(now.getMinutes());
+    alarms.forEach(function(a){
+      if(!a.on) return;
+      if(a.snoozeUntil){
+        if(Date.now() >= a.snoozeUntil){
+          a.snoozeUntil = null; saveAlarms(); renderAlarms();
+          showBanner("ALARM (snoozed)", (a.label ? a.label + " — " : "") + fmtAlarmTime(a.time), true, {type:"alarm", id:a.id});
+        }
+        return;
+      }
+      if(a.time === cur && a.firedKey !== key){
+        a.firedKey = key; saveAlarms();
+        showBanner("ALARM", (a.label ? a.label + " — " : "") + fmtAlarmTime(a.time), true, {type:"alarm", id:a.id});
+      }
+    });
+  }
+
+  /* ---------- timer ---------- */
+  var timerLeft = 0, timerEnd = 0, timerRunning = false;
+  function readInputs(){
+    var h = Math.max(0, parseInt($("tH").value || "0", 10) || 0);
+    var m = Math.max(0, Math.min(59, parseInt($("tM").value || "0", 10) || 0));
+    var s = Math.max(0, Math.min(59, parseInt($("tS").value || "0", 10) || 0));
+    return h*3600 + m*60 + s;
+  }
+  function fmtDur(sec){
+    sec = Math.max(0, Math.ceil(sec));
+    var h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+    return pad(h) + ":" + pad(m) + ":" + pad(s);
+  }
+  function drawTimer(){ $("timerReadout").textContent = fmtDur(timerRunning ? (timerEnd - Date.now())/1000 : timerLeft); }
+  $("timerStart").addEventListener("click", function(){
+    ensureAudio();
+    if(timerRunning) return;
+    if(timerLeft <= 0) timerLeft = readInputs();
+    if(timerLeft <= 0) return;
+    timerEnd = Date.now() + timerLeft*1000;
+    timerRunning = true;
+    $("timerStart").textContent = "Running…";
+    drawTimer();
+  });
+  $("timerPause").addEventListener("click", function(){
+    if(!timerRunning) return;
+    timerLeft = Math.max(0, (timerEnd - Date.now())/1000);
+    timerRunning = false;
+    $("timerStart").textContent = "Resume";
+    drawTimer();
+  });
+  $("timerReset").addEventListener("click", function(){
+    timerRunning = false; timerLeft = 0;
+    $("timerStart").textContent = "Start";
+    $("timerReadout").textContent = fmtDur(readInputs());
+  });
+  ["tH","tM","tS"].forEach(function(id){
+    $(id).addEventListener("input", function(){ if(!timerRunning && timerLeft <= 0) $("timerReadout").textContent = fmtDur(readInputs()); });
+  });
+  function checkTimer(){
+    if(!timerRunning) return;
+    if(Date.now() >= timerEnd){
+      timerRunning = false; timerLeft = 0;
+      $("timerStart").textContent = "Start";
+      $("timerReadout").textContent = "00:00:00";
+      showBanner("TIMER DONE", "", false, {type:"timer"});
+    } else drawTimer();
+  }
+
+  /* ---------- main loop ---------- */
+  function loop(){ tickClock(); checkAlarms(); checkTimer(); }
+  renderAlarms();
+  $("timerReadout").textContent = fmtDur(readInputs());
+  loop();
+  setInterval(loop, 250);
+})();
+</script>
+</body>
+</html>
