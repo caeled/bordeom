@@ -61,6 +61,7 @@
   <div id="status"></div>
   <div id="results"></div>
   <div id="moreWrap"></div>
+  <div id="googleLine" class="hint" style="text-align:center"></div>
 
   <div class="panel" id="consentCard">
     <h2>Here is what I noticed. May I adapt?</h2>
@@ -98,7 +99,7 @@
   </div>
 </main>
 <footer>
-  Privacy, plainly: your pattern and settings live only in this browser (localStorage). The only thing that leaves this machine is the search query itself, sent to DuckDuckGo and Wikipedia, the same as using them directly.<br>
+  Privacy, plainly: your pattern and settings live only in this browser (localStorage). The only thing that leaves this machine is the search query itself, sent to DuckDuckGo and Wikipedia (and to Google, if a Google search key is configured), the same as using them directly.<br>
   Prototype built Nov 8, 2026. Not a diagnosis tool. It adapts presentation; it does not label you.
 </footer>
 
@@ -157,6 +158,22 @@ function fetchDDG(q) {
     return out;
   }).catch(function () { return []; });
 }
+/* Google Programmable Search. Needs a free API key + search engine ID (cx) from
+   Google's Programmable Search Engine (100 free searches/day). Until both are
+   filled in, Google results are skipped and a "search this on Google" link is
+   shown instead. Steven: these two values are yours to create in your Google
+   account; the moment they are pasted here, Google joins the merged results. */
+var GOOGLE = { apiKey: '', cx: '' };
+function parseGoogle(d, q) {
+  return ((d && d.items) || []).map(function (it) {
+    return { title: it.title, url: it.link, text: (it.snippet || '').replace(/\n/g, ' '), source: 'Google', factual: 0 };
+  });
+}
+function fetchGoogle(q) {
+  if (!GOOGLE.apiKey || !GOOGLE.cx) return Promise.resolve([]);
+  var url = 'https://www.googleapis.com/customsearch/v1?key=' + encodeURIComponent(GOOGLE.apiKey) + '&cx=' + encodeURIComponent(GOOGLE.cx) + '&q=' + encodeURIComponent(q);
+  return fetch(url).then(function (r) { return r.json(); }).then(function (d) { return parseGoogle(d, q); }).catch(function () { return []; });
+}
 function fetchWiki(q) {
   var url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(q) + '&format=json&origin=*&srlimit=6';
   return fetch(url).then(function (r) { return r.json(); }).then(function (d) {
@@ -179,6 +196,7 @@ var DEMO = [
 var els = {};
 ['q','go','demo','status','results','moreWrap','consentCard','observations','acceptBtn','declineBtn','noticedBtn','resetBtn','setLiteral','setFocus','setDepth','setSteps'].forEach(function (id) { els[id] = document.getElementById(id); });
 var currentResults = [];
+var lastShownQuery = '';
 function applySettingsTo(results) {
   var s = state.settings, out = results.slice();
   if (s.literal) out.sort(function (a, b) { return (b.factual || 0) - (a.factual || 0); });
@@ -204,6 +222,8 @@ function render(expanded) {
   }).join('');
   els.moreWrap.innerHTML = (s.focus && !expanded && list.length > 3)
     ? '<button class="btn secondary" id="moreBtn">Show ' + (list.length - 3) + ' more results (tangents)</button>' : '';
+  var gl = document.getElementById('googleLine');
+  if (gl) gl.innerHTML = lastShownQuery ? 'Also: <a href="https://www.google.com/search?q=' + encodeURIComponent(lastShownQuery) + '" target="_blank" rel="noopener">search this exact question on Google</a>' + (GOOGLE.apiKey ? '' : ' (Google results join this page once a search key is added)') : '';
   var more = document.getElementById('moreBtn');
   if (more) more.addEventListener('click', function () { state.signals.expansions++; save(); render(true); });
   Array.prototype.forEach.call(els.results.querySelectorAll('a[data-click]'), function (a) {
@@ -240,8 +260,9 @@ function doSearch() {
   if (sig.lastQuery && now - sig.lastQueryAt < 30000 && q !== sig.lastQuery) sig.reformulations++;
   sig.queries++; sig.wordsTotal += q.split(/\s+/).length; sig.lastQueryAt = now; sig.lastQuery = q; save();
   els.status.textContent = 'Searching...';
-  Promise.all([fetchDDG(q), fetchWiki(q)]).then(function (both) {
-    currentResults = both[0].concat(both[1]);
+  Promise.all([fetchDDG(q), fetchWiki(q), fetchGoogle(q)]).then(function (both) {
+    currentResults = both[0].concat(both[2]).concat(both[1]);
+    lastShownQuery = q;
     if (!currentResults.length) { els.status.textContent = 'No results came back (the search services may be unreachable). Try the Demo results button to see how adaptation works.'; render(false); return; }
     els.status.textContent = currentResults.length + ' results for "' + q + '".';
     render(false); maybeAskConsent();
@@ -276,7 +297,7 @@ els.resetBtn.addEventListener('click', function () {
   els.status.textContent = 'Forgotten. Pattern and settings cleared from this browser.';
 });
 syncControls();
-if (typeof module !== 'undefined') { module.exports = { inferProfile: inferProfile }; }
+if (typeof module !== 'undefined') { module.exports = { inferProfile: inferProfile, parseGoogle: parseGoogle }; }
 </script>
 </body>
 </html>
