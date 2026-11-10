@@ -28,3 +28,6 @@ Uploaded to ~/workspace/user/files: warp.py, fractal.py, morse.py, surprise.py, 
 
 ## bounce.py received Nov 9, 2026 — VERIFIED
 Uploaded by Steven (~/workspace/user/files/bounce.py) and pushed the same evening: placed at programs/bounce.py and site/programs/bounce.py; public README rows and run lists updated in both trees; hub card flipped to IN THE COLLECTION with a download link. Self-test run by Muse on Linux (SDL dummy drivers): ALL PASSED (17 checks). The last Nov 5 loose end is closed.
+
+## sky.py (Skywatch) received Nov 9, 2026 — VERIFIED
+Built by Steven's Muse CLI the evening the library Celestron came home; uploaded by Steven (~/workspace/user/files/sky.py) and pushed the same evening: programs/sky.py and site/programs/sky.py, README rows in both trees, new hub card. Self-test run by Muse on Linux (SDL dummy drivers): ALL PASSED (29 checks, including M31 RA and Vega precession J2000 -> Nov 2026). The CLI's planned sky.exe (PyInstaller) stays on Steven's side for now, his call on how it ships.
