@@ -25,3 +25,6 @@ Uploaded to ~/workspace/user/files: warp.py, fractal.py, morse.py, surprise.py, 
 - The folder's full README (programs/README-full.md) stays PRIVATE: it prints bounce.py's hidden weekday-Morse Easter egg, which Steven designed to be unmentioned. Public edition written at programs/README.md (usage only, no egg, no working notes).
 - bounce.py did NOT come over — still on Steven's machine; hub card waits for it.
 - Publish-ready tree assembled + local git commit at ~/workspace/bordeom/site/ (index.html, gym-companion.html, programs/). Remaining: Steven's home pick (GitHub repo vs geekgalaxy), then push + verify live.
+
+## bounce.py received Nov 9, 2026 — VERIFIED
+Uploaded by Steven (~/workspace/user/files/bounce.py) and pushed the same evening: placed at programs/bounce.py and site/programs/bounce.py; public README rows and run lists updated in both trees; hub card flipped to IN THE COLLECTION with a download link. Self-test run by Muse on Linux (SDL dummy drivers): ALL PASSED (17 checks). The last Nov 5 loose end is closed.
