@@ -156,7 +156,7 @@ def render_page(base, boxes, results=None):
         parts.append("</ul></div>")
 
     parts.append("<form method='post' action='/copy'>")
-    parts.append("<table class='matrix'><tr><th>From</th><th>Box</th><th>Files (click a name to read it)</th></tr>")
+    parts.append("<table class='matrix'><tr><th>Box</th><th>Files (tick the ones to copy; click [read] to view)</th></tr>")
     for i, box in enumerate(boxes):
         files = routable_files(box)
         if files:
@@ -169,8 +169,7 @@ def render_page(base, boxes, results=None):
         else:
             links = "<span class='empty'>no routable files</span>"
         parts.append(
-            f"<tr><td><input class='srcradio' type='radio' name='src' value='{i}'></td>"
-            f"<td><b>{esc(box['label'])}</b></td><td>{links}</td></tr>")
+            f"<tr><td><b>{esc(box['label'])}</b></td><td>{links}</td></tr>")
     parts.append("</table>")
 
     options = "".join(f"<option value='{i}'>{esc(b['label'])}</option>"
@@ -179,9 +178,9 @@ def render_page(base, boxes, results=None):
         "<div class='panel'><b>Copy the checked files into:</b> "
         f"<select name='dest'>{options}</select> "
         "<button class='go' type='submit'>Copy</button>"
-        "<div class='sub' style='margin-top:8px'>How to use: choose the source box with a "
-        "radio button on the left, tick the files in that row, pick the destination box, "
-        "press Copy. A different file with the same name at the destination is never "
+        "<div class='sub' style='margin-top:8px'>How to use: tick the files you want in "
+        "ONE box's row (that row is the source), pick the destination box, press Copy. "
+        "A different file with the same name at the destination is never "
         "overwritten &mdash; it is reported as a conflict for you to settle in Explorer.</div></div>")
     parts.append("</form>")
 
@@ -261,23 +260,32 @@ class Handler(BaseHTTPRequestHandler):
         boxes = discover_boxes(self.base)
         results = []
         try:
-            src_box = boxes[int(form["src"][0])]
             dest_box = boxes[int(form["dest"][0])]
         except (KeyError, ValueError, IndexError):
             self._send(200, render_page(self.base, boxes,
-                                        [("error", "Pick a source box (radio button) and a destination box first.")]))
+                                        [("error", "Pick a destination box first.")]))
             return
+        # The source box is whichever row the ticked files live in.
+        picked = []
+        for value in form.get("file", []):
+            idx, _, name = value.partition(":")
+            if idx.isdigit() and 0 <= int(idx) < len(boxes):
+                picked.append((int(idx), name))
+        if not picked:
+            results.append(("error", "No files were ticked. Tick at least one file, then press Copy."))
+            self._send(200, render_page(self.base, boxes, results))
+            return
+        src_indexes = {idx for idx, _ in picked}
+        if len(src_indexes) > 1:
+            results.append(("error", "Files from more than one box are ticked. "
+                                     "Tick files from just one row, then press Copy. Nothing was copied."))
+            self._send(200, render_page(self.base, boxes, results))
+            return
+        src_box = boxes[src_indexes.pop()]
         if src_box["path"] == dest_box["path"]:
-            results.append(("error", "Source and destination are the same box. Nothing copied."))
+            results.append(("error", "The ticked files already live in the destination box. Nothing copied."))
         else:
-            picked = []
-            for value in form.get("file", []):
-                idx, _, name = value.partition(":")
-                if idx.isdigit() and int(idx) == boxes.index(src_box):
-                    picked.append(name)
-            if not picked:
-                results.append(("error", "No files were checked in the source box's row. Nothing copied."))
-            for name in picked:
+            for _, name in picked:
                 results.append(copy_one(src_box, dest_box, name))
         self._send(200, render_page(self.base, discover_boxes(self.base), results))
 
