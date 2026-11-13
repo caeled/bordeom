@@ -249,10 +249,24 @@ async function fetchBuf(url) {
 let PROXY_BASE = null;
 function setProxyBase(b) { PROXY_BASE = b || null; }
 function proxyURL(u) { return PROXY_BASE + "/fetch?url=" + encodeURIComponent(u); }
-async function fetchBufVia(url) { return fetchBuf(PROXY_BASE ? proxyURL(url) : url); }
+/* When the proxy refuses a fetch it answers 502 with a JSON reason
+   ("source answered HTTP 401", "fetch failed: ..."). Surface that
+   reason instead of a bare "HTTP 502" so the status line says why. */
+async function proxyReason(r) {
+  try {
+    const d = await r.clone().json();
+    if (d && d.error) return d.error;
+  } catch (e) { /* not a proxy JSON error */ }
+  return "HTTP " + r.status;
+}
+async function fetchBufVia(url) {
+  const r = await fetch(PROXY_BASE ? proxyURL(url) : url);
+  if (!r.ok) throw new Error(await proxyReason(r));
+  return r.arrayBuffer();
+}
 async function fetchTextVia(url) {
   const r = await fetch(PROXY_BASE ? proxyURL(url) : url);
-  if (!r.ok) throw new Error("HTTP " + r.status);
+  if (!r.ok) throw new Error(await proxyReason(r));
   return r.text();
 }
 
@@ -495,8 +509,21 @@ if (typeof document !== "undefined") {
         const api = b.source === "wikisource" ? WS_API : WB_API;
         openReadable(b, await wikiChapters(api, b.book_title));
       } else if (b.mode === "proxyepub") {
-        const buf = await fetchBufVia(b.fileUrl);
-        openReadable(b, await epubChapters(buf));
+        try {
+          const buf = await fetchBufVia(b.fileUrl);
+          openReadable(b, await epubChapters(buf));
+        } catch (e) {
+          /* An Archive/Open Library file can turn out to be loan-gated
+             even when the catalog lists it (the source then refuses the
+             download). Fall back to the Archive reader instead of
+             dead-ending on the refusal. */
+          if (b.iaId) {
+            b.mode = "embed";
+            addToLibrary(b);
+            $("status").textContent = "That file is not openly downloadable (" + e.message + "). Opening the Archive reader instead.";
+            openLibraryBook(b);
+          } else { throw e; }
+        }
       } else if (b.mode === "embed") {
         state.book = b; state.chapters = [];
         $("text").style.display = "none"; $("embedWrap").style.display = "block";

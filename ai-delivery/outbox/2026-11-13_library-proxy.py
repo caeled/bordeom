@@ -126,8 +126,10 @@ class Handler(BaseHTTPRequestHandler):
                         break
                     self.wfile.write(chunk)
         except urllib.error.HTTPError as e:
+            sys.stderr.write("[proxy] upstream HTTP %d for %s\n" % (e.code, target))
             self._json(502, {"ok": False, "error": "source answered HTTP %d" % e.code})
         except Exception as e:  # network down, DNS, timeout...
+            sys.stderr.write("[proxy] fetch failed for %s: %s\n" % (target, e))
             self._json(502, {"ok": False, "error": "fetch failed: %s" % e})
 
     def log_message(self, fmt, *args):
