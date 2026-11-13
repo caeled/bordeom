@@ -1,0 +1,38 @@
+Everyday Cool Library App — the home proxy is built (Nov 13, 2026)
+
+WHAT THIS IS
+The proxy you asked about: it fetches book files server-side so the
+web edition reads all six sources natively in the page. Gutenberg,
+Internet Archive and Open Library stop handing you off to their own
+readers, and Standard Ebooks appears as a source. Tested end to end
+before delivery: Frankenstein read in the page from Gutenberg (31
+chapters), The Time Machine from Standard Ebooks (18 chapters),
+Archive EPUBs native.
+
+FILES IN THIS DROP
+- 2026-11-13_library-web-index.html — the updated library page.
+- 2026-11-13_library-proxy.py — the proxy itself (Python standard
+  library only, nothing to install).
+- 2026-11-13_library-proxy.bat — double-click launcher for it.
+
+TO LAND IT
+1. Save 2026-11-13_library-web-index.html over your hosted library
+   page (the same index.html you replaced last night, in the library
+   folder next to banner.png).
+2. Put library-proxy.py and library-proxy.bat somewhere on
+   PowellServer and double-click the .bat. A console window opens and
+   stays open while the proxy runs (port 8766). Ctrl+C or closing the
+   window stops it.
+3. Reload the library page. The sidebar should say "Home proxy:
+   connected. All six sources read in this page." and the Standard
+   Ebooks checkbox unlocks. If it says "not detected," the page still
+   works exactly as before, just with the old hand-offs.
+
+NOTES
+- The proxy only fetches from the library's own book sources
+  (gutenberg.org, archive.org, openlibrary.org, standardebooks.org).
+  It is for the home network; do not expose port 8766 to the internet.
+- If the proxy window is closed, the page quietly falls back to the
+  old behavior. Nothing breaks either way.
+- Also pushed to GitHub: everyday-cool-library-app (proxy/ folder and
+  web/index.html) and the Everyday Cool copy of the page.
