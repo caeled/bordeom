@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everyday Cool Library App — Web Edition</title>
+<style>
+  :root { --ink:#2a1f16; --paper:#fdf8ee; --accent:#b5762a; --panel:#f4ead6; --line:#d8c49a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Georgia, 'Times New Roman', serif; background:#241a10; color:var(--ink); }
+  header { background:#171008; text-align:center; }
+  header img { max-width:900px; width:100%; height:auto; display:block; margin:0 auto; }
+  header .fallback { color:#f4ead6; padding:14px; font-size:22px; letter-spacing:.5px; }
+  .sub { background:var(--panel); border-bottom:2px solid var(--line); padding:8px 14px; font-size:14px; }
+  main { display:flex; gap:0; max-width:1280px; margin:0 auto; background:var(--paper); min-height:70vh; }
+  #side { width:340px; border-right:2px solid var(--line); padding:12px; background:#fbf4e4; }
+  #reader { flex:1; padding:14px 18px; display:flex; flex-direction:column; }
+  .sources label { display:block; font-size:14px; margin:3px 0; }
+  #q { width:100%; padding:8px; font-size:15px; margin:8px 0; border:1px solid var(--line); border-radius:4px; }
+  button { font-family:inherit; background:var(--accent); color:#fff; border:0; border-radius:4px; padding:7px 12px; cursor:pointer; font-size:14px; }
+  button.plain { background:#e7dcc2; color:var(--ink); }
+  button:disabled { opacity:.45; cursor:default; }
+  h3 { margin:14px 0 6px; font-size:15px; border-bottom:1px solid var(--line); padding-bottom:3px; }
+  ul.list { list-style:none; margin:0; padding:0; }
+  ul.list li { padding:7px 8px; border-bottom:1px solid #eadfc6; cursor:pointer; font-size:14px; }
+  ul.list li:hover { background:#f1e6cb; }
+  ul.list li .src { color:#8a6a35; font-size:12px; }
+  ul.list li .note { color:#7a6a4d; font-size:12px; display:block; }
+  #status { font-size:13px; color:#6b5836; min-height:18px; margin:6px 0; }
+  #bookTitle { font-size:20px; font-weight:bold; margin:2px 0 8px; }
+  .nav { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  .nav select { flex:1; min-width:160px; padding:6px; font-family:inherit; }
+  #text { flex:1; overflow-y:auto; white-space:pre-wrap; line-height:1.55; font-size:17px; padding:14px 16px; background:#fffdf6; border:1px solid var(--line); border-radius:4px; max-height:66vh; }
+  #embedWrap { flex:1; display:none; }
+  #embedWrap iframe { width:100%; height:66vh; border:1px solid var(--line); border-radius:4px; }
+  footer { color:#cbb98f; text-align:center; font-size:13px; padding:12px; }
+  footer a { color:#e8cf9e; }
+  @media (max-width: 820px) { main { flex-direction:column; } #side { width:auto; border-right:0; } }
+</style>
+</head>
+<body>
+<header>
+  <img src="banner.png" alt="Everyday Cool Tech Bench" onerror="this.outerHTML='&lt;div class=&quot;fallback&quot;&gt;Everyday Cool Library App&lt;/div&gt;'">
+</header>
+<div class="sub">The web edition of the <strong>Everyday Cool Library App</strong> — search five open libraries and read in the page. Wikibooks and Wikisource read natively here; Gutenberg, Internet Archive and Open Library open at their own reader pages, because those sites do not let other pages fetch their book files (a browser rule called CORS). Your own EPUB files open natively too. Places and your library list are kept in this browser.</div>
+
+<main>
+  <section id="side">
+    <div class="sources">
+      <label><input type="checkbox" id="src-gb" checked> Project Gutenberg</label>
+      <label><input type="checkbox" id="src-wb" checked> Wikibooks</label>
+      <label><input type="checkbox" id="src-ws"> Wikisource</label>
+      <label><input type="checkbox" id="src-ia" checked> Internet Archive</label>
+      <label><input type="checkbox" id="src-ol"> Open Library</label>
+    </div>
+    <input id="q" type="text" placeholder="Title or author...">
+    <button id="searchBtn" style="width:100%">Search</button>
+    <div id="status"></div>
+    <h3>Search results</h3>
+    <ul class="list" id="results"></ul>
+    <h3>My library</h3>
+    <ul class="list" id="library"></ul>
+    <h3>Your own files</h3>
+    <input type="file" id="localFile" accept=".epub,application/epub+zip">
+    <div style="font-size:12px;color:#7a6a4d;margin-top:4px">Opens an EPUB from this device and reads it here. Nothing is uploaded.</div>
+  </section>
+
+  <section id="reader">
+    <div id="bookTitle">No book open</div>
+    <div class="nav">
+      <button class="plain" id="prevBtn">&lt;&lt; Prev</button>
+      <button class="plain" id="nextBtn">Next &gt;&gt;</button>
+      <select id="chapSel"></select>
+      <button class="plain" id="smaller">A-</button>
+      <button class="plain" id="bigger">A+</button>
+      <button class="plain" id="openSrc" style="display:none">Open at the source</button>
+    </div>
+    <div id="text">Open a book from your library, search for a new one, or pick one of your own EPUB files.
+
+Your place is saved automatically as you read (in this browser only).</div>
+    <div id="embedWrap"><iframe id="embed" title="Internet Archive reader" allowfullscreen></iframe></div>
+  </section>
+</main>
+
+<footer>An <a href="https://github.com/caeled/everyday-cool">Everyday Cool</a> subproject · <a href="https://github.com/caeled/everyday-cool-library-app">Everyday Cool Library App</a> · Code MIT, writing CC BY 4.0 · Books keep their own sources' terms.</footer>
+
+<script>
+"use strict";
+/* =====================================================================
+   Everyday Cool Library App — web edition logic.
+   Pure-logic functions first (they also run under Node for testing);
+   browser wiring at the bottom.
+   ===================================================================== */
+
+function slugify(t, fb) {
+  const s = String(t || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+  return s || (fb || "book");
+}
+
+/* ---------------- minimal ZIP reader (stored + deflate) ------------- */
+async function zipEntries(buf) {
+  const dv = new DataView(buf);
+  const u8 = new Uint8Array(buf);
+  let eocd = -1;
+  for (let i = buf.byteLength - 22; i >= 0 && i >= buf.byteLength - 22 - 65536; i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("Not a ZIP/EPUB file.");
+  const count = dv.getUint16(eocd + 10, true);
+  let off = dv.getUint32(eocd + 16, true);
+  const entries = {};
+  const dec = new TextDecoder();
+  for (let n = 0; n < count; n++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true);
+    const csize = dv.getUint32(off + 20, true);
+    const nlen = dv.getUint16(off + 28, true);
+    const elen = dv.getUint16(off + 30, true);
+    const clen = dv.getUint16(off + 32, true);
+    const lho = dv.getUint32(off + 42, true);
+    const name = dec.decode(u8.subarray(off + 46, off + 46 + nlen));
+    entries[name] = { method, csize, lho };
+    off += 46 + nlen + elen + clen;
+  }
+  async function read(name) {
+    const e = entries[name];
+    if (!e) return null;
+    const lnlen = dv.getUint16(e.lho + 26, true);
+    const lelen = dv.getUint16(e.lho + 28, true);
+    const start = e.lho + 30 + lnlen + lelen;
+    const raw = u8.subarray(start, start + e.csize);
+    if (e.method === 0) return raw.slice().buffer;
+    if (e.method === 8) {
+      const stream = new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return await new Response(stream).arrayBuffer();
+    }
+    throw new Error("Unsupported ZIP method " + e.method);
+  }
+  async function text(name) {
+    const b = await read(name);
+    return b ? dec.decode(new Uint8Array(b)) : null;
+  }
+  return { names: Object.keys(entries), read, text };
+}
+
+/* ---------------- HTML to readable text ------------------------------ */
+function htmlToText(html) {
+  let s = String(html || "");
+  s = s.replace(/<(script|style|noscript)[\s\S]*?<\/\1>/gi, " ");
+  s = s.replace(/<\/(p|div|h[1-6]|li|tr|blockquote|section|article)>/gi, "\n\n");
+  s = s.replace(/<br\s*\/?>/gi, "\n");
+  s = s.replace(/<[^>]+>/g, "");
+  s = s.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<")
+       .replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+       .replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n))
+       .replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCharCode(parseInt(n, 16)));
+  return s.split("\n").map(l => l.replace(/[ \t]+/g, " ").trim()).join("\n")
+          .replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function xmlTag(xml, tag) {
+  const m = new RegExp("<" + tag + "[^>]*>([\\s\\S]*?)</" + tag + ">").exec(xml || "");
+  return m ? m[1] : null;
+}
+
+/* ---------------- EPUB parsing --------------------------------------- */
+async function epubChapters(buf) {
+  const zip = await zipEntries(buf);
+  const container = await zip.text("META-INF/container.xml");
+  if (!container) throw new Error("Not an EPUB (no container.xml).");
+  const rootfile = /full-path="([^"]+)"/.exec(container);
+  if (!rootfile) throw new Error("EPUB container has no package file.");
+  const opfPath = rootfile[1];
+  const opfDir = opfPath.includes("/") ? opfPath.slice(0, opfPath.lastIndexOf("/") + 1) : "";
+  const opf = await zip.text(opfPath);
+  const manifest = {};
+  for (const m of opf.matchAll(/<item\s+[^>]*>/g)) {
+    const tag = m[0];
+    const id = /id="([^"]+)"/.exec(tag), href = /href="([^"]+)"/.exec(tag);
+    if (id && href) manifest[id[1]] = href[1];
+  }
+  const spine = [];
+  for (const m of opf.matchAll(/<itemref\s+[^>]*idref="([^"]+)"[^>]*>/g)) spine.push(m[1]);
+  // NCX chapter titles
+  const titles = {};
+  const ncxItem = Object.keys(manifest).find(k => /\.ncx$/i.test(manifest[k]));
+  if (ncxItem) {
+    const ncx = await zip.text(opfDir + manifest[ncxItem]);
+    if (ncx) {
+      for (const m of ncx.matchAll(/<navPoint[\s\S]*?<text>([\s\S]*?)<\/text>[\s\S]*?<content src="([^"]+)"/g)) {
+        titles[m[2].split("#")[0]] = htmlToText(m[1]);
+      }
+    }
+  }
+  const chapters = [];
+  for (const idref of spine) {
+    const href = manifest[idref];
+    if (!href) continue;
+    const raw = await zip.text(opfDir + href);
+    if (raw === null) continue;
+    const text = htmlToText(raw);
+    if (text.length < 40) continue; // cover pages and other stubs
+    chapters.push({ title: titles[href] || ("Section " + (chapters.length + 1)), text });
+  }
+  if (!chapters.length) throw new Error("No readable chapters in that EPUB.");
+  return chapters;
+}
+
+async function epubTitle(buf) {
+  try {
+    const zip = await zipEntries(buf);
+    const container = await zip.text("META-INF/container.xml");
+    const opfPath = /full-path="([^"]+)"/.exec(container)[1];
+    const opf = await zip.text(opfPath);
+    const t = xmlTag(opf, "dc:title");
+    return t ? htmlToText(t) : null;
+  } catch (e) { return null; }
+}
+
+/* ---------------- sources: search ------------------------------------ */
+async function fetchJSON(url, headers) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(url, headers ? { headers } : undefined);
+    if (r.ok) return r.json();
+    if ((r.status === 429 || r.status === 503) && attempt < 2) {
+      await new Promise(res => setTimeout(res, 3000)); // rate limited: back off once or twice
+      continue;
+    }
+    throw new Error("HTTP " + r.status);
+  }
+  throw new Error("HTTP 429");
+}
+async function fetchBuf(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.arrayBuffer();
+}
+
+async function searchGutenberg(q, limit) {
+  limit = limit || 20;
+  const d = await fetchJSON("https://gutendex.com/books/?search=" + encodeURIComponent(q));
+  return (d.results || []).slice(0, limit).map(b => {
+    const f = b.formats || {};
+    return {
+      source: "gutenberg", id: "gutenberg-" + b.id,
+      title: b.title || "Untitled",
+      author: (b.authors || []).map(a => a.name).filter(Boolean).join(", "),
+      mode: "link", url: "https://www.gutenberg.org/ebooks/" + b.id,
+      note: "Reads at gutenberg.org"
+    };
+  });
+}
+
+const WB_API = "https://en.wikibooks.org/w/api.php";
+const WS_API = "https://en.wikisource.org/w/api.php";
+const WIKI_HEADERS = { "Api-User-Agent": "EverydayCoolLibraryApp/1.0 (web edition; caeled@gmail.com)" };
+
+async function searchWiki(api, source, label, q, limit) {
+  limit = limit || 20;
+  const u = api + "?action=query&list=search&srnamespace=0&srlimit=" + limit +
+            "&format=json&origin=*&srsearch=" + encodeURIComponent(q);
+  const d = await fetchJSON(u, WIKI_HEADERS);
+  const seen = new Set(), out = [];
+  for (const hit of ((d.query || {}).search || [])) {
+    const root = (hit.title || "").split("/")[0].trim();
+    if (!root || seen.has(root)) continue;
+    seen.add(root);
+    out.push({ source, id: source + "-" + slugify(root), title: root, author: label,
+               mode: "wiki", book_title: root });
+  }
+  return out;
+}
+
+async function wikiChapters(api, bookTitle) {
+  const parse = async (page, prop) => {
+    const u = api + "?action=parse&format=json&origin=*&disableeditsection=1&page=" +
+              encodeURIComponent(page) + "&prop=" + prop;
+    const d = await fetchJSON(u, WIKI_HEADERS);
+    return d.parse || null;
+  };
+  const root = await parse(bookTitle, "links");
+  const pages = [bookTitle];
+  if (root && root.links) {
+    const prefix = bookTitle.replace(/\/$/, "") + "/";
+    for (const l of root.links) {
+      const t = l["*"];
+      if (t && t.startsWith(prefix) && !pages.includes(t) && !t.split("/").pop().includes(":")) pages.push(t);
+    }
+  }
+  const chapters = [];
+  for (const page of pages) {
+    const p = await parse(page, "text");
+    if (!p || !p.text) continue;
+    const text = htmlToText(p.text["*"]);
+    if (!text) continue;
+    const label = page.slice(bookTitle.length).replace(/^\//, "").replace(/_/g, " ") || "Introduction";
+    chapters.push({ title: label.slice(0, 120), text });
+  }
+  if (!chapters.length) throw new Error("Could not read any pages of that book.");
+  return chapters;
+}
+
+const IA_META = "https://archive.org/metadata/";
+
+async function iaOpenFile(identifier) {
+  const meta = await fetchJSON(IA_META + identifier);
+  const md = meta.metadata || {};
+  if (String(md["access-restricted-item"]).toLowerCase() === "true") return null;
+  const files = meta.files || [];
+  const epub = files.find(f => /\.epub$/i.test(f.name) && !/_lcp|encrypted/i.test(f.name));
+  if (epub) return { ext: ".epub" };
+  if (files.some(f => /\.pdf$/i.test(f.name))) return { ext: ".pdf" };
+  return null;
+}
+
+async function searchArchive(q, limit, probe) {
+  limit = limit || 12; probe = probe || 18;
+  const query = "mediatype:texts AND (title:(" + q + ") OR creator:(" + q + "))";
+  const u = "https://archive.org/advancedsearch.php?q=" + encodeURIComponent(query) +
+            "&fl%5B%5D=identifier&fl%5B%5D=title&fl%5B%5D=creator&sort%5B%5D=downloads+desc&rows=" +
+            probe + "&output=json";
+  const d = await fetchJSON(u);
+  const out = [];
+  for (const doc of ((d.response || {}).docs || [])) {
+    let f = null;
+    try { f = await iaOpenFile(doc.identifier); } catch (e) { f = null; }
+    if (!f) continue;
+    const creator = Array.isArray(doc.creator) ? doc.creator.join(", ") : (doc.creator || "");
+    out.push({ source: "archive", id: "ia-" + slugify(doc.identifier), iaId: doc.identifier,
+               title: doc.title || doc.identifier, author: creator, mode: "embed",
+               url: "https://archive.org/details/" + doc.identifier,
+               note: "Reads in the Archive reader below" });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+async function searchOpenLibrary(q, limit, probe) {
+  limit = limit || 12; probe = probe || 20;
+  const d = await fetchJSON("https://openlibrary.org/search.json?fields=title,author_name,ia&limit=" +
+                             probe + "&q=" + encodeURIComponent(q));
+  const out = [], seen = new Set();
+  for (const doc of (d.docs || [])) {
+    for (const ident of (doc.ia || [])) {
+      if (seen.has(ident)) continue;
+      seen.add(ident);
+      let f = null;
+      try { f = await iaOpenFile(ident); } catch (e) { f = null; }
+      if (!f) continue;
+      out.push({ source: "openlibrary", id: "ol-" + slugify(ident), iaId: ident,
+                 title: doc.title || ident, author: (doc.author_name || []).join(", "),
+                 mode: "embed", url: "https://archive.org/details/" + ident,
+                 note: "Reads in the Archive reader below" });
+      break;
+    }
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/* =====================================================================
+   Browser wiring below this line.
+   ===================================================================== */
+if (typeof document !== "undefined") {
+  const $ = id => document.getElementById(id);
+  const LS_LIB = "ecl_library", LS_PLACE = "ecl_places";
+  const load = (k, dflt) => { try { return JSON.parse(localStorage.getItem(k)) || dflt; } catch (e) { return dflt; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+  const state = { book: null, chapters: [], chapter: 0, fontSize: 17, items: [] };
+  const LABELS = { gutenberg: "Gutenberg", wikibooks: "Wikibooks", wikisource: "Wikisource",
+                   archive: "Internet Archive", openlibrary: "Open Library", local: "Local file" };
+
+  function refreshLibrary() {
+    const ul = $("library"); ul.innerHTML = "";
+    for (const b of load(LS_LIB, [])) {
+      const li = document.createElement("li");
+      li.textContent = b.title;
+      li.onclick = () => openLibraryBook(b);
+      ul.appendChild(li);
+    }
+  }
+  function addToLibrary(rec) {
+    const lib = load(LS_LIB, []).filter(b => b.id !== rec.id);
+    lib.unshift(rec); save(LS_LIB, lib); refreshLibrary();
+  }
+  function getPlace(id) { return load(LS_PLACE, {})[id] || { chapter: 0, fraction: 0 }; }
+  function setPlace(id, chapter, fraction) {
+    const all = load(LS_PLACE, {}); all[id] = { chapter, fraction }; save(LS_PLACE, all);
+  }
+
+  function showChapter(idx, fraction) {
+    if (!state.chapters.length) return;
+    idx = Math.max(0, Math.min(idx, state.chapters.length - 1));
+    state.chapter = idx;
+    const ch = state.chapters[idx];
+    $("text").textContent = ch.text;
+    $("chapSel").value = String(idx);
+    $("prevBtn").disabled = idx === 0;
+    $("nextBtn").disabled = idx === state.chapters.length - 1;
+    requestAnimationFrame(() => { $("text").scrollTop = fraction ? fraction * $("text").scrollHeight : 0; });
+    if (state.book) setPlace(state.book.id, idx, fraction || 0);
+  }
+
+  function openReadable(record, chapters) {
+    state.book = record; state.chapters = chapters;
+    $("embedWrap").style.display = "none"; $("text").style.display = "block";
+    $("openSrc").style.display = "none";
+    $("bookTitle").textContent = record.title;
+    const sel = $("chapSel"); sel.innerHTML = "";
+    chapters.forEach((c, i) => {
+      const o = document.createElement("option"); o.value = String(i); o.textContent = c.title; sel.appendChild(o);
+    });
+    const place = getPlace(record.id);
+    showChapter(Math.min(place.chapter || 0, chapters.length - 1), place.fraction || 0);
+    $("status").textContent = "Now reading: " + record.title;
+  }
+
+  async function openLibraryBook(b) {
+    try {
+      $("status").textContent = "Opening " + b.title + "...";
+      if (b.mode === "wiki") {
+        const api = b.source === "wikisource" ? WS_API : WB_API;
+        openReadable(b, await wikiChapters(api, b.book_title));
+      } else if (b.mode === "embed") {
+        state.book = b; state.chapters = [];
+        $("text").style.display = "none"; $("embedWrap").style.display = "block";
+        $("embed").src = "https://archive.org/embed/" + b.iaId;
+        $("bookTitle").textContent = b.title;
+        $("openSrc").style.display = ""; $("openSrc").onclick = () => window.open(b.url, "_blank");
+        $("status").textContent = "Reading in the Archive reader: " + b.title;
+      } else if (b.mode === "link") {
+        window.open(b.url, "_blank");
+      }
+    } catch (e) { $("status").textContent = "Could not open that book: " + e.message; }
+  }
+
+  $("searchBtn").onclick = async () => {
+    const q = $("q").value.trim();
+    if (!q) return;
+    const jobs = [];
+    if ($("src-gb").checked) jobs.push(["Project Gutenberg", searchGutenberg(q)]);
+    if ($("src-wb").checked) jobs.push(["Wikibooks", searchWiki(WB_API, "wikibooks", "Wikibooks contributors", q)]);
+    if ($("src-ws").checked) jobs.push(["Wikisource", searchWiki(WS_API, "wikisource", "Wikisource", q)]);
+    if ($("src-ia").checked) jobs.push(["Internet Archive", searchArchive(q)]);
+    if ($("src-ol").checked) jobs.push(["Open Library", searchOpenLibrary(q)]);
+    if (!jobs.length) { $("status").textContent = "Tick at least one source."; return; }
+    $("status").textContent = "Searching...";
+    const found = [], errors = [];
+    for (const [name, p] of jobs) {
+      try { found.push(...await p); } catch (e) { errors.push(name + ": " + e.message); }
+    }
+    state.items = found;
+    const ul = $("results"); ul.innerHTML = "";
+    for (const item of found) {
+      const li = document.createElement("li");
+      li.innerHTML = "<span class='src'>[" + LABELS[item.source] + "]</span> " +
+                     item.title.replace(/</g, "&lt;") +
+                     (item.author ? " — " + item.author.replace(/</g, "&lt;") : "") +
+                     (item.note ? "<span class='note'>" + item.note + "</span>" : "");
+      li.onclick = () => { addToLibrary(item); openLibraryBook(item); };
+      ul.appendChild(li);
+    }
+    $("status").textContent = found.length + " result(s)." + (errors.length ? " Errors: " + errors.join("; ") : "");
+  };
+  $("q").addEventListener("keydown", e => { if (e.key === "Enter") $("searchBtn").click(); });
+
+  $("prevBtn").onclick = () => showChapter(state.chapter - 1, 0);
+  $("nextBtn").onclick = () => showChapter(state.chapter + 1, 0);
+  $("chapSel").onchange = () => showChapter(+$("chapSel").value, 0);
+  $("smaller").onclick = () => { state.fontSize = Math.max(12, state.fontSize - 1); $("text").style.fontSize = state.fontSize + "px"; };
+  $("bigger").onclick = () => { state.fontSize = Math.min(28, state.fontSize + 1); $("text").style.fontSize = state.fontSize + "px"; };
+  let scrollTimer = null;
+  $("text").addEventListener("scroll", () => {
+    if (!state.book || state.book.mode === "embed") return;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const el = $("text");
+      const frac = el.scrollHeight > el.clientHeight ? el.scrollTop / el.scrollHeight : 0;
+      setPlace(state.book.id, state.chapter, frac);
+    }, 400);
+  });
+
+  $("localFile").addEventListener("change", async ev => {
+    const f = ev.target.files[0];
+    if (!f) return;
+    try {
+      $("status").textContent = "Opening " + f.name + "...";
+      const buf = await f.arrayBuffer();
+      const chapters = await epubChapters(buf);
+      const title = (await epubTitle(buf)) || f.name.replace(/\.epub$/i, "");
+      const rec = { source: "local", id: "local-" + slugify(title) + "-" + f.size, title,
+                    author: "", mode: "localfile" };
+      // local files are not re-openable from the list after a reload; read now.
+      openReadable(rec, chapters);
+    } catch (e) { $("status").textContent = "Could not open that file: " + e.message; }
+  });
+
+  refreshLibrary();
+}
+
+/* Node test hook */
+if (typeof module !== "undefined") {
+  module.exports = { slugify, zipEntries, htmlToText, epubChapters, epubTitle,
+                     searchGutenberg, searchWiki, wikiChapters, searchArchive,
+                     searchOpenLibrary, WB_API, WS_API };
+}
+</script>
+</body>
+</html>

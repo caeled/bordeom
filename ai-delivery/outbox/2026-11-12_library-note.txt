@@ -1,0 +1,22 @@
+Library App web edition — placement note (Nov 12, 2026)
+
+Three files crossed with this note:
+
+1. 2026-11-12_library-index.html  ->  save as index.html in the new
+   folder web\steve\phoenix\library\ on the site (the folder behind
+   http://caeled.geekgalaxy.com/web/steve/phoenix/library/).
+2. 2026-11-12_library-banner.png  ->  same folder, name stays
+   banner.png. The page looks for it beside itself and shows a plain
+   title if it is not there.
+3. 2026-11-12_mis-portal-personal-index.html  ->  your personal MIS
+   portal index, Save-As over the existing index.html as usual. It
+   adds the big green Library button beside Phoenix AI Resources in
+   Study quick links, pointing at the library address above.
+
+The student portal got the same button and is already pushed to
+GitHub (Pages rebuilds itself).
+
+The library page itself: Wikibooks and Wikisource read in the page,
+your own EPUB files open in the page, Archive/Open Library read in
+an embedded Archive reader, Gutenberg opens at the source. Places
+and the library list are kept in the browser.
