@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caeled's Private Home Page</title>
+<style>
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: #f4f1ea;
+    color: #2b2b2b;
+    margin: 0;
+    padding: 2rem 1rem;
+  }
+  .desk {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fffdf8;
+    border: 1px solid #d8d2c4;
+    border-radius: 10px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+  h1 {
+    margin-top: 0;
+    font-size: 1.9rem;
+    border-bottom: 2px solid #d8d2c4;
+    padding-bottom: 0.5rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    border-bottom: 1px solid #eee7d8;
+  }
+  li:last-child {
+    border-bottom: none;
+  }
+  a {
+    display: block;
+    padding: 0.55rem 0.25rem;
+    color: #1a4f8b;
+    text-decoration: none;
+    font-size: 1.05rem;
+  }
+  a:hover {
+    background: #f0ead9;
+    color: #0d2f57;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  h2 {
+    scroll-margin-top: 1rem;
+  }
+
+  .headtable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .headtable td {
+    vertical-align: top;
+    padding: 0.25rem;
+  }
+  .colside {
+    width: 22%;
+  }
+  .colmid {
+    width: 56%;
+    text-align: center;
+  }
+  .sidehead {
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+  }
+
+
+  .rightlist {
+    margin: 0.6rem 0 0;
+    padding-left: 1.2rem;
+    text-align: left;
+  }
+  .rightlist li {
+    border-bottom: none;
+    padding: 0.15rem 0;
+    font-size: 0.98rem;
+  }
+  .rightlist a {
+    display: inline;
+    padding: 0;
+    font-size: 0.98rem;
+  }
+  .placeholderish {
+    color: #9a917e;
+    font-style: italic;
+  }
+  .btnstack {
+    list-style: none;
+    margin: 0.6rem 0 0;
+    padding: 0;
+  }
+  .btnstack li {
+    border-bottom: none;
+    padding: 0.2rem 0;
+    text-align: center;
+  }
+  .libbtn.small {
+    font-size: 0.92rem;
+    padding: 0.35rem 0.55rem;
+  }
+  .govlist {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+  .govlist li {
+    border-bottom: none;
+    padding: 0.15rem 0;
+    font-size: 0.98rem;
+  }
+  .govlist a {
+    display: inline;
+    padding: 0;
+    font-size: 0.98rem;
+  }
+  .soonlist {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+  .soonlist li {
+    border-bottom: none;
+    padding: 0.15rem 0;
+    color: #9a917e;
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+  .libbtn {
+    display: inline-block;
+    background: #f3ecd9;
+    border: 1px solid #c9c2ae;
+    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    font-size: 1rem;
+  }
+  .funhead {
+    font-family: "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive;
+    font-size: 2.3rem;
+    font-weight: bold;
+    text-align: center;
+    color: #b3541e;
+    letter-spacing: 0.04em;
+    margin: 0.5rem auto 0.8rem;
+    text-shadow: 2px 2px 0 #f3ecd9;
+  }
+  .indexbar {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fffdf8;
+    border: 1px solid #d8d2c4;
+    border-radius: 10px;
+    padding: 0.7rem 1.1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    line-height: 2;
+    font-size: 0.95rem;
+  }
+  .indexbar a {
+    display: inline;
+    padding: 0.15rem 0.3rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    border-radius: 4px;
+  }
+  .indexbar .sep {
+    color: #b6ad97;
+  }
+  .toppick a {
+    background: #f3ecd9;
+    font-weight: bold;
+  }
+  .jumpwrap {
+    margin: 0 0 1rem;
+  }
+  .jumpwrap select {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #c9c2ae;
+    border-radius: 6px;
+    background: #fffdf8;
+    color: #2b2b2b;
+    max-width: 100%;
+  }
+  .placeholder a {
+    color: #9a917e;
+    font-style: italic;
+  }
+
+  .stackl { list-style: none; margin: 0.4rem 0 0; padding: 0; }
+  .stackl li { border-bottom: none; padding: 0.2rem 0; text-align: left; }
+  .stackl .libbtn { display: block; text-align: left; }
+  .stackr { list-style: none; margin: 0; padding: 0; }
+  .stackr li { border-bottom: none; padding: 0.2rem 0; text-align: right; }
+  .subcols { width: 100%; border-collapse: collapse; }
+  .subcols td { vertical-align: top; padding: 0 0 0 0.6rem; }
+  .subcols td:first-child { padding-left: 0; }
+
+  .socialcol { text-align: right; }
+  .socialcol .stackr { display: inline-block; text-align: right; }
+
+  .privwrap { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 1.5rem; max-width: 1200px; margin: 1.5rem auto 0; }
+  .searchrail { background: #fffdf8; border: 1px solid #d8d2c4; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); width: 340px; }
+  .searchrail h2 { margin-top: 0; }
+</style>
+</head>
+<body>
+  <table class="headtable">
+    <tr>
+      <td class="colside">
+        <div class="sidehead">Government</div>
+        <ul class="stackl">
+          <li><a class="libbtn small" href="https://www.cityofdefiance.com/">Defiance City</a></li>
+          <li><a class="libbtn small" href="https://www.defiance-county.com/">Defiance County</a></li>
+          <li><a class="libbtn small" href="https://ohio.gov/">Ohio State</a></li>
+          <li><a class="libbtn small" href="https://www.usa.gov/">Federal Government</a></li>
+          <li><a class="libbtn small" href="https://www.un.org/">United Nations</a></li>
+          <li><a class="libbtn small" href="https://www.ed.gov/">Department of Education</a></li>
+          <li><a class="libbtn small" href="https://www.hhs.gov/">Department of Health</a></li>
+        </ul>
+      </td>
+      <td class="colmid">
+        <a href="https://copilot.microsoft.com/" title="Copilot"><img src="http://caeled.geekgalaxy.com/web/steve/phoenix/robots-header.jpg" alt="Cute robots holding open doors across a meadow" style="display:block; width:100%; max-width:1200px; margin:0 auto 1rem; border-radius:10px;"></a>
+        <div class="funhead">Caeled's Private Home Page</div>
+        <div style="text-align: center; margin-top: 0.6rem;"><a class="libbtn" href="http://caeled.geekgalaxy.com/web/steve/phoenix/LinkFromPortal.html">SEARCH</a> <a class="libbtn" href="http://caeled.geekgalaxy.com/web/steve/tech/DeepSupportPortal.html">Support Portal</a> <a class="libbtn" href="http://caeled.geekgalaxy.com/web/steve/tech/Security/Index.html">Security</a> <a class="libbtn" href="http://caeled.geekgalaxy.com/web/steve/tech/computer/index.html">Computer</a> <a class="libbtn" href="http://caeled.geekgalaxy.com/web/steve/phoenix/mis-portal-personal/">Student Portal</a> <a class="libbtn" href="https://grok.com/c/cb0e1217-e669-42d5-9ac4-ac4be46d27ef">Subject News Update</a> <a class="libbtn" href="https://research-portal-ihgj.pages.grok.bot/">Space Research</a></div>
+      </td>
+      <td class="colside">
+        <table class="subcols"><tr>
+          <td>
+            <ul class="stackr">
+              <li><a class="libbtn" href="http://caeled.geekgalaxy.com/web/steve/phoenix/DigitalLibrary.html">Digital Library</a>
+<a class="libbtn" href="http://caeled.geekgalaxy.com/Web/Steve/phoenix/banner-gallery/">Banner Gallery</a></li>
+              <li><a class="libbtn small" href="http://caeled.geekgalaxy.com/web/steve/phoenix/AudioArchive.html">Audio Archive</a></li>
+              <li><a class="libbtn small" href="https://notebook.google.com/notebook/0d70e944-e6cc-4485-a888-f71f4419168b">Knowledge Bases</a></li>
+              <li><a class="libbtn small" href="https://www.uchicagomedicine.org/">Chicago Clinic</a></li>
+              <li><a class="libbtn small" href="https://www.mayoclinic.org/">Mayo Clinic</a></li>
+              <li><a class="libbtn small" href="https://www.mercy.com/">Mercy Health</a></li>
+              <li><a class="libbtn small" href="https://www.promedica.org/">ProMedica Health</a></li>
+            </ul>
+          </td>
+          <td class="socialcol">
+            <div class="sidehead" style="text-align: right;">Social Media</div>
+            <ul class="stackr">
+              <li><a class="libbtn small" href="https://www.facebook.com/">Facebook</a></li>
+              <li><a class="libbtn small" href="https://www.reddit.com/">Reddit</a></li>
+              <li><a class="libbtn small" href="https://www.instagram.com/">Instagram</a></li>
+              <li><a class="libbtn small" href="https://truthsocial.com/">Truth Social</a></li>
+              <li><a class="libbtn small" href="https://www.linkedin.com/in/stevendouglaspowell">LinkedIn</a></li>
+              <li><a class="libbtn small" href="https://x.com/">X</a></li>
+              <li><a class="libbtn small" href="https://www.youtube.com/">YouTube</a></li>
+              <li><a class="libbtn small" href="https://stevendouglaspowell.substack.com">Substack</a></li>
+              <li><a class="libbtn small" href="https://github.com/caeled">GitHub</a></li>
+            </ul>
+          </td>
+        </tr></table>
+      
+      </td>
+    </tr>
+  </table>
+  <nav class="indexbar"><strong>Index:</strong> <a href="#search">Search</a> <span class="sep">&middot;</span> <a href="#core">The Core Projects</a> <span class="sep">&middot;</span> <a href="#analysis">Analysis &amp; Exploration</a> <span class="sep">&middot;</span> <a href="#reference">Reference &amp; Recovered Data</a></nav>
+  <div class="privwrap">
+  <div class="desk" style="margin: 0;">
+    <h2 id="core">The Core Projects</h2>
+    <ul class="cat">
+      <li><a href="./Autism/index.html">Autism Terminal</a></li>
+      <li><a href="./THCAI/Index.html">THC/AI Master Index</a></li>
+      <li><a href="./Medical/">Medical Records</a></li>
+      <li><a href="./Tech/">Tech Project Directory</a></li>
+      <li><a href="./Bridge/">The Bridge Interface</a></li>
+      <li><a href="./citypulse/">CityPulse</a></li>
+    </ul>
+    <h2 id="analysis">Analysis &amp; Exploration</h2>
+    <ul class="cat">
+      <li><a href="./AISuggestions.html">AI Suggestions Manifest</a></li>
+      <li><a href="./DeepExplore.html">Explore Alpha</a></li>
+      <li><a href="./DeepExplore2.html">Explore Beta</a></li>
+      <li><a href="./DeepWiki.html">Wiki Knowledge</a></li>
+      <li><a href="./GPTexplore.html">GPT Exploration Engine</a></li>
+      <li><a href="./CoPiloteXPLORE.html">CoPilot Research</a></li>
+      <li><a href="./AncientAstro.html">Ancient Astro Research</a></li>
+      <li><a href="./Explore.html">General Exploration</a></li>
+      <li><a href="./special.html">Specialized Logic</a></li>
+    </ul>
+    <h2 id="reference">Reference &amp; Recovered Data</h2>
+    <ul class="cat">
+      <li><a href="./PhoneBook.html">PhoneBook Directory</a></li>
+      <li><a href="./YellowPages.html">YellowPages Index</a></li>
+      <li><a href="./DeepBooks.html">Books Archive</a></li>
+      <li><a href="./DeepLegal.html">Legal Reference</a></li>
+      <li><a href="./DeepBanned.html">Banned Content</a></li>
+      <li><a href="./DeepPorn.html">Adult</a></li>
+      <li><a href="./facebook2024.zip">FB2024 Recovery (.zip)</a></li>
+      <li><a href="./BestMusic.html">BestMusic Frequency</a></li>
+      <li><a href="./New.html">New Entry</a></li>
+    </ul>
+  </div>
+  <div class="searchrail">
+    <h2 id="search" style="margin-top: 0;">Search</h2>
+    <form onsubmit="return deskSearch(this)">
+      <input type="text" name="q" placeholder="Type your search..." required
+             style="width: 55%; padding: 0.45rem; font-size: 1rem; vertical-align: top;">
+      <details class="picker">
+        <summary id="engineSummary">Google</summary>
+        <div class="panel">
+          <label><input type="checkbox" name="engine" value="https://www.google.com/search?q=" data-name="Google" checked> Google</label>
+          <label><input type="checkbox" name="engine" value="https://www.bing.com/search?q=" data-name="Microsoft Bing"> Microsoft Bing</label>
+          <label><input type="checkbox" name="engine" value="https://duckduckgo.com/?q=" data-name="DuckDuckGo"> DuckDuckGo</label>
+          <label><input type="checkbox" name="engine" value="https://search.brave.com/search?q=" data-name="Brave Search"> Brave Search</label>
+          <label><input type="checkbox" name="engine" value="https://search.yahoo.com/search?p=" data-name="Yahoo! Search"> Yahoo! Search</label>
+          <label><input type="checkbox" name="engine" value="https://www.baidu.com/s?wd=" data-name="Baidu"> Baidu</label>
+          <label><input type="checkbox" name="engine" value="https://yandex.com/search/?text=" data-name="Yandex"> Yandex</label>
+          <label><input type="checkbox" name="engine" value="https://www.ecosia.org/search?q=" data-name="Ecosia"> Ecosia</label>
+          <label><input type="checkbox" name="engine" value="https://www.startpage.com/sp/search?query=" data-name="Startpage"> Startpage</label>
+          <label><input type="checkbox" name="engine" value="https://www.qwant.com/?q=" data-name="Qwant"> Qwant</label>
+          <label><input type="checkbox" name="engine" value="https://www.mojeek.com/search?q=" data-name="Mojeek"> Mojeek</label>
+          <label><input type="checkbox" name="engine" value="https://kagi.com/search?q=" data-name="Kagi"> Kagi</label>
+          <label><input type="checkbox" name="engine" value="https://www.dogpile.com/serp?q=" data-name="Dogpile"> Dogpile</label>
+          <label><input type="checkbox" name="engine" value="https://www.metacrawler.com/serp?q=" data-name="MetaCrawler"> MetaCrawler</label>
+          <label><input type="checkbox" name="engine" value="https://www.webcrawler.com/serp?q=" data-name="WebCrawler"> WebCrawler</label>
+          <label><input type="checkbox" name="engine" value="https://search.lycos.com/web/?q=" data-name="Lycos"> Lycos</label>
+          <label><input type="checkbox" name="engine" value="https://swisscows.com/en/web?query=" data-name="Swisscows"> Swisscows</label>
+          <label><input type="checkbox" name="engine" value="https://you.com/search?q=" data-name="You.com"> You.com</label>
+          <label><input type="checkbox" name="engine" value="https://yep.com/search?q=" data-name="Yep"> Yep</label>
+          <label><input type="checkbox" name="engine" value="https://www.sogou.com/web?query=" data-name="Sogou"> Sogou</label>
+          <label><input type="checkbox" name="engine" value="https://scholar.google.com/scholar?q=" data-name="Google Scholar"> Google Scholar</label>
+          <label><input type="checkbox" name="engine" value="https://openverse.org/search?q=" data-name="Openverse"> Openverse</label>
+          <label><input type="checkbox" name="engine" value="https://www.shodan.io/search?query=" data-name="Shodan"> Shodan</label>
+        </div>
+      </details>
+      <button type="submit" style="padding: 0.45rem 0.9rem; font-size: 1rem; vertical-align: top;">Go</button>
+      <p style="margin: 0.5rem 0 0; font-size: 0.9rem; color: #6b6353;">If only one tab opens, your browser blocked the rest as pop-ups: click the pop-up icon at the right end of the address bar, choose "Always allow pop-ups and redirects" for this site, and search again. You only have to do that once.</p>
+    </form>
+  </div>
+</div>
+  <a href="https://muse.ai" title="Muse"><img src="http://caeled.geekgalaxy.com/web/steve/phoenix/ai-footer.jpg" alt="Various friendly AI beings holding open doors along a path" style="display:block; width:100%; max-width:1200px; margin:1.5rem auto 0; border-radius:10px;"></a>
+<script>
+    function pickedEngines(f) {
+      return f.querySelectorAll('input[name="engine"]:checked');
+    }
+    function refreshSummary(f) {
+      var names = [];
+      pickedEngines(f).forEach(function (b) { names.push(b.dataset.name); });
+      document.getElementById("engineSummary").textContent =
+        names.length ? (names.length <= 2 ? names.join(", ") : names.length + " engines") : "Pick an engine";
+    }
+    document.querySelectorAll('input[name="engine"]').forEach(function (b) {
+      b.addEventListener("change", function () { refreshSummary(b.form); });
+    });
+    function deskSearch(f) {
+      var q = encodeURIComponent(f.q.value);
+      var picked = pickedEngines(f);
+      if (picked.length === 0) { alert("Pick at least one engine"); return false; }
+      var blocked = 0;
+      picked.forEach(function (b) {
+        var w = window.open(b.value + q, "_blank");
+        if (!w) { blocked++; }
+      });
+      if (blocked > 0) {
+        alert(blocked + " tab(s) were blocked by your browser's pop-up blocker. " +
+              "Click the pop-up icon in the address bar and choose 'Always allow pop-ups' for this site, then search again.");
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>
