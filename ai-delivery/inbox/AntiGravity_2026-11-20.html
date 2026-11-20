@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIS Knowledge Portal — University of Phoenix</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-elev: #121933;
+      --bg-card: #161f3f;
+      --bg-hover: #1d2952;
+      --border: #26335e;
+      --text: #edf2ff;
+      --text-muted: #9aa7cc;
+      --accent: #6366f1;
+      --accent-soft: rgba(99, 102, 241, 0.16);
+      --ai: #06b6d4;
+      --ai-soft: rgba(6, 182, 212, 0.16);
+      --gold: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --bg-elev: #ffffff;
+      --bg-card: #ffffff;
+      --bg-hover: #eef2ff;
+      --border: #dce3f2;
+      --text: #111827;
+      --text-muted: #52607a;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.1);
+      --ai: #0891b2;
+      --ai-soft: rgba(8, 145, 178, 0.12);
+      --shadow: 0 6px 18px rgba(17, 24, 39, 0.07);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--bg-elev);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .nav-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 4px 10px 2px;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text);
+      padding: 9px 11px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      text-align: left;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .nav-btn:hover { background: var(--bg-hover); }
+    .nav-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    .nav-btn.ai-featured.active {
+      background: var(--ai-soft);
+      border-color: var(--ai);
+    }
+    .nav-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .badge-count {
+      font-size: 0.75rem;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .ai-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: var(--ai-soft);
+      color: var(--ai);
+      border: 1px solid var(--ai);
+      margin-left: 4px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .footer-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Main area */
+    .main {
+      flex: 1;
+      padding: 24px 28px 48px;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 11px 14px 11px 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-size: 0.94rem;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select, .btn {
+      padding: 10px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--bg-hover); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+    .btn-primary:hover { filter: brightness(1.08); background: var(--accent); }
+    .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
+    .btn-ghost { background: transparent; }
+
+    /* Hero / Context Header */
+    .section-header {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-header.ai-banner {
+      border-color: var(--ai);
+      background: linear-gradient(135deg, var(--bg-elev), var(--ai-soft));
+    }
+    .section-title { font-size: 1.35rem; font-weight: 700; }
+    .section-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 3px; }
+
+    /* AI sub-track chips */
+    .chip-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip:hover { color: var(--text); border-color: var(--ai); }
+    .chip.active {
+      background: var(--ai);
+      border-color: var(--ai);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Cards Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow);
+      transition: transform 0.14s, border-color 0.14s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+    .card.is-ai:hover { border-color: var(--ai); }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .tag.ai { background: var(--ai-soft); color: var(--ai); }
+    .tag.neutral {
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background: var(--bg-hover); color: var(--text); }
+    .icon-btn.starred { color: var(--gold); border-color: var(--gold); }
+
+    .card-title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .card-title:hover { color: var(--accent); text-decoration: underline; }
+    .card.is-ai .card-title:hover { color: var(--ai); }
+
+    .card-desc {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mini-tag {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .open-link {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .card.is-ai .open-link { color: var(--ai); }
+    .open-link:hover { text-decoration: underline; }
+
+    .note-box {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .note-box.open { display: flex; }
+    .note-area {
+      width: 100%;
+      min-height: 76px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+      resize: vertical;
+    }
+    .note-hint { font-size: 0.74rem; color: var(--success); }
+
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+      background: var(--bg-elev);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
+    .modal h2 { font-size: 1.15rem; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 860px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .main { padding: 18px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-title">🎓 MIS Knowledge Portal</div>
+      <div class="brand-sub">University of Phoenix • MIS & Deep AI Hub</div>
+    </div>
+    <img src="antigravity-robot.png" alt="AntiGravity robot mascot (AI-generated image)" style="width:100%; border-radius:12px; margin:4px 0 12px; display:block;" />
+
+    <div>
+      <div class="nav-section-label">Views</div>
+      <div class="nav-list" id="quickNav"></div>
+    </div>
+
+    <div>
+      <div class="nav-section-label">MIS & AI Domains</div>
+      <div class="nav-list" id="categoryNav"></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="footer-row">
+        <button class="btn btn-sm" id="themeBtn" style="flex:1;">☀️ Light Mode</button>
+        <button class="btn btn-sm" id="exportBtn" style="flex:1;">⬇️ Export</button>
+      </div>
+      <label class="btn btn-sm" style="text-align:center; display:block;">
+        ⬆️ Import Backup
+        <input type="file" id="importInput" accept="application/json" style="display:none;" />
+      </label>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search knowledge bases, frameworks, SQL, AI, NIST, or your notes..." />
+      </div>
+      <div class="controls">
+        <select id="typeFilter" aria-label="Filter by resource type">
+          <option value="all">All Resource Types</option>
+          <option value="Knowledge Base">Knowledge Base</option>
+          <option value="Course / Learning">Course / Learning</option>
+          <option value="Framework / Standard">Framework / Standard</option>
+          <option value="Tool / Sandbox">Tool / Sandbox</option>
+          <option value="Research / Journal">Research / Journal</option>
+        </select>
+        <button class="btn btn-primary" id="addBtn">+ Add Resource</button>
+      </div>
+    </div>
+
+    <div class="section-header" id="sectionHeader">
+      <div>
+        <div class="section-title" id="sectionTitle">All MIS & AI Resources</div>
+        <div class="section-desc" id="sectionDesc">Curated knowledge bases, standards, tools, and research hubs for your MIS degree.</div>
+      </div>
+      <div class="badge-count" id="resultCount">0 resources</div>
+    </div>
+
+    <div class="chip-bar" id="aiTrackBar" style="display:none;"></div>
+
+    <section class="grid" id="cardsGrid"></section>
+  </main>
+
+  <!-- Add Resource Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Add Custom Resource</h2>
+      <form id="addForm">
+        <div class="field">
+          <label for="fTitle">Title *</label>
+          <input id="fTitle" required placeholder="e.g., UOPX MIS Capstone Library Guide" />
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label for="fUrl">URL *</label>
+          <input id="fUrl" type="url" required placeholder="https://..." />
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label for="fCategory">Domain *</label>
+          <select id="fCategory"></select>
+        </div>
+        <div class="field" id="fAiTrackWrap" style="margin-top:8px; display:none;">
+          <label for="fAiTrack">AI Sub-Track</label>
+          <select id="fAiTrack">
+            <option value="Foundations">Foundations</option>
+            <option value="LLMs & Prompting">LLMs & Prompting</option>
+            <option value="RAG & Agents">RAG & Agents</option>
+            <option value="Enterprise Strategy">Enterprise Strategy</option>
+            <option value="Governance & Risk">Governance & Risk</option>
+            <option value="Research & Benchmarks">Research & Benchmarks</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label for="fType">Resource Type</label>
+          <select id="fType">
+            <option value="Knowledge Base">Knowledge Base</option>
+            <option value="Course / Learning">Course / Learning</option>
+            <option value="Framework / Standard">Framework / Standard</option>
+            <option value="Tool / Sandbox">Tool / Sandbox</option>
+            <option value="Research / Journal">Research / Journal</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label for="fDesc">Description</label>
+          <textarea id="fDesc" rows="2" placeholder="Why this resource is useful for your coursework..."></textarea>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label for="fTags">Tags (comma-separated)</label>
+          <input id="fTags" placeholder="UOPX, Syllabus, SQL, Week 1" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      custom: "uopx_mis_portal_v1_custom",
+      bookmarks: "uopx_mis_portal_v1_bookmarks",
+      notes: "uopx_mis_portal_v1_notes",
+      theme: "uopx_mis_portal_v1_theme"
+    };
+
+    const CATEGORIES = [
+      {
+        id: "ai",
+        name: "AI Deep Dive",
+        icon: "🤖",
+        featured: true,
+        desc: "Comprehensive AI hub: ML foundations, LLMs & prompting, RAG & agentic architectures, enterprise AI strategy, AI governance/risk, and live research benchmarks."
+      },
+      {
+        id: "uopx",
+        name: "UOPX & MIS Research",
+        icon: "🏛️",
+        desc: "University of Phoenix hub, premier academic MIS journals, IT leadership publications, and executive glossaries."
+      },
+      {
+        id: "databases",
+        name: "Databases & SQL",
+        icon: "🗄️",
+        desc: "Relational & NoSQL documentation, interactive SQL practice, ER data modeling, query indexing, and analytics engineering."
+      },
+      {
+        id: "bi",
+        name: "BI, Analytics & Viz",
+        icon: "📊",
+        desc: "Business intelligence platforms (Power BI, Tableau, Looker), public datasets, and executive data storytelling."
+      },
+      {
+        id: "sad-pm",
+        name: "Systems Design & PM",
+        icon: "📐",
+        desc: "SDLC, Agile/Scrum, PMBOK project management, business analysis (BABOK), UML, and architecture diagramming."
+      },
+      {
+        id: "enterprise",
+        name: "Enterprise & Cloud",
+        icon: "☁️",
+        desc: "Cloud architecture centers (AWS, Azure, GCP), ERP/CRM ecosystems (SAP, Salesforce), TOGAF, and networking fundamentals."
+      },
+      {
+        id: "security",
+        name: "Cybersecurity & GRC",
+        icon: "🛡️",
+        desc: "NIST frameworks, ISACA/COBIT IT governance, OWASP application security, MITRE ATT&CK, and CISA advisories."
+      },
+      {
+        id: "dev",
+        name: "Programming & APIs",
+        icon: "💻",
+        desc: "Python, web fundamentals, REST API testing, Git version control, and interactive career/skills roadmaps."
+      }
+    ];
+
+    const AI_TRACKS = [
+      "All AI",
+      "Foundations",
+      "LLMs & Prompting",
+      "RAG & Agents",
+      "Enterprise Strategy",
+      "Governance & Risk",
+      "Research & Benchmarks"
+    ];
+
+    const SEED_RESOURCES = [
+      // === AI DEEP DIVE ===
+      { id: "ai-1", category: "ai", aiTrack: "Foundations", type: "Course / Learning", title: "DeepLearning.AI", url: "https://www.deeplearning.ai/", desc: "Industry-standard short courses and specializations covering ML fundamentals, generative AI, RAG, and agentic workflows.", tags: ["ML", "GenAI", "Short Courses"] },
+      { id: "ai-2", category: "ai", aiTrack: "Foundations", type: "Course / Learning", title: "Google Machine Learning Crash Course", url: "https://developers.google.com/machine-learning/crash-course", desc: "Free hands-on ML curriculum with interactive visualizations covering regression, classification, neural networks, and LLMs.", tags: ["ML", "Hands-On", "Free"] },
+      { id: "ai-3", category: "ai", aiTrack: "Foundations", type: "Course / Learning", title: "Fast.ai — Practical Deep Learning", url: "https://www.fast.ai/", desc: "Top-down, code-first practical deep learning courses designed to make modern AI accessible to builders.", tags: ["Deep Learning", "PyTorch", "Practical"] },
+      { id: "ai-4", category: "ai", aiTrack: "Foundations", type: "Course / Learning", title: "3Blue1Brown — Neural Networks & Transformers", url: "https://www.3blue1brown.com/topics/neural-networks", desc: "Best visual intuition on the internet for backpropagation, attention mechanisms, and how transformers actually work.", tags: ["Transformers", "Intuition", "Visual"] },
+      { id: "ai-5", category: "ai", aiTrack: "Foundations", type: "Course / Learning", title: "Stanford CS229 Machine Learning", url: "https://cs229.stanford.edu/", desc: "Classic university-level lecture notes and syllabus for rigorous mathematical foundations of machine learning.", tags: ["Academic", "Theory", "Stanford"] },
+
+      { id: "ai-6", category: "ai", aiTrack: "LLMs & Prompting", type: "Knowledge Base", title: "Anthropic Documentation & Prompt Engineering", url: "https://docs.anthropic.com/", desc: "Deep guidance on prompt engineering, context management, tool use, evals, and building reliable LLM systems.", tags: ["Prompting", "Evals", "Context"] },
+      { id: "ai-7", category: "ai", aiTrack: "LLMs & Prompting", type: "Knowledge Base", title: "OpenAI Developer Docs & Cookbook", url: "https://platform.openai.com/docs/", desc: "API references, structured outputs, fine-tuning guides, and practical cookbook patterns for production LLM apps.", tags: ["APIs", "Fine-Tuning", "Cookbook"] },
+      { id: "ai-8", category: "ai", aiTrack: "LLMs & Prompting", type: "Knowledge Base", title: "Google Gemini API Documentation", url: "https://ai.google.dev/gemini-api/docs", desc: "Multimodal AI guides covering long-context processing, grounding, function calling, and structured generation.", tags: ["Multimodal", "Long Context", "API"] },
+      { id: "ai-9", category: "ai", aiTrack: "LLMs & Prompting", type: "Knowledge Base", title: "Prompt Engineering Guide (DAIR.AI)", url: "https://www.promptingguide.ai/", desc: "Open-source living handbook covering zero/few-shot, chain-of-thought, ReAct, RAG prompting, and adversarial safety.", tags: ["Techniques", "Open Source", "CoT"] },
+      { id: "ai-10", category: "ai", aiTrack: "LLMs & Prompting", type: "Course / Learning", title: "Hugging Face Hub & Courses", url: "https://huggingface.co/learn", desc: "Free hands-on courses for NLP, LLMs, AI Agents, and open-weights model deployment alongside the world's largest model hub.", tags: ["Open Weights", "NLP", "Hub"] },
+
+      { id: "ai-11", category: "ai", aiTrack: "RAG & Agents", type: "Knowledge Base", title: "Model Context Protocol (MCP)", url: "https://modelcontextprotocol.io/", desc: "Open standard for connecting AI models securely to enterprise data sources, databases, and operational tools.", tags: ["Agents", "Enterprise Integration", "Standard"] },
+      { id: "ai-12", category: "ai", aiTrack: "RAG & Agents", type: "Knowledge Base", title: "LangChain Documentation", url: "https://python.langchain.com/docs/introduction/", desc: "Architecture patterns and conceptual guides for retrieval-augmented generation (RAG), tool calling, and agent orchestration.", tags: ["RAG", "Orchestration", "Python"] },
+      { id: "ai-13", category: "ai", aiTrack: "RAG & Agents", type: "Knowledge Base", title: "LlamaIndex Documentation", url: "https://docs.llamaindex.ai/", desc: "Data framework docs specializing in indexing, vector search, chunking strategies, and knowledge-assistant workflows.", tags: ["RAG", "Vector Search", "Data Pipelines"] },
+      { id: "ai-14", category: "ai", aiTrack: "RAG & Agents", type: "Knowledge Base", title: "Simon Willison's Weblog", url: "https://simonwillison.net/", desc: "Sharp, pragmatic engineering commentary on LLM capabilities, prompt injection, local models, and practical AI tooling.", tags: ["Engineering", "Security", "Practical"] },
+      { id: "ai-15", category: "ai", aiTrack: "RAG & Agents", type: "Course / Learning", title: "Full Stack Deep Learning", url: "https://fullstackdeeplearning.com/", desc: "Focuses on the real-world MIS/engineering side: ML lifecycle, data pipelines, testing, monitoring, and deployment.", tags: ["MLOps", "Production", "Lifecycle"] },
+
+      { id: "ai-16", category: "ai", aiTrack: "Enterprise Strategy", type: "Research / Journal", title: "Stanford HAI — AI Index Report", url: "https://hai.stanford.edu/ai-index", desc: "Definitive annual data-driven report on global AI investment, business adoption, productivity impact, and policy.", tags: ["Strategy", "Metrics", "Citations"] },
+      { id: "ai-17", category: "ai", aiTrack: "Enterprise Strategy", type: "Research / Journal", title: "McKinsey QuantumBlack AI Insights", url: "https://www.mckinsey.com/capabilities/quantumblack/our-insights", desc: "Executive case studies on enterprise AI ROI, operating models, change management, and value realization—great for MIS papers.", tags: ["ROI", "Case Studies", "Executive"] },
+      { id: "ai-18", category: "ai", aiTrack: "Enterprise Strategy", type: "Knowledge Base", title: "Gartner AI Resource Center", url: "https://www.gartner.com/en/topics/artificial-intelligence", desc: "Enterprise trends, hype-cycle concepts, and CIO frameworks for scaling AI across IT organizations.", tags: ["CIO", "Adoption", "Strategy"] },
+      { id: "ai-19", category: "ai", aiTrack: "Enterprise Strategy", type: "Research / Journal", title: "MIT CSAIL Research & News", url: "https://www.csail.mit.edu/", desc: "Frontier AI research bridging computer science innovations with real-world enterprise and societal impact.", tags: ["Research", "MIT", "Emerging Tech"] },
+
+      { id: "ai-20", category: "ai", aiTrack: "Governance & Risk", type: "Framework / Standard", title: "NIST AI Risk Management Framework (AI RMF)", url: "https://www.nist.gov/itl/ai-risk-management-framework", desc: "Essential US standard (Govern, Map, Measure, Manage) for trustworthy enterprise AI governance—a must-cite in MIS papers.", tags: ["NIST", "Governance", "Compliance"] },
+      { id: "ai-21", category: "ai", aiTrack: "Governance & Risk", type: "Framework / Standard", title: "OWASP Top 10 for LLM & GenAI Applications", url: "https://genai.owasp.org/", desc: "Security taxonomy for prompt injection, sensitive data disclosure, supply-chain risks, and excessive agency in AI apps.", tags: ["AI Security", "OWASP", "Risk"] },
+      { id: "ai-22", category: "ai", aiTrack: "Governance & Risk", type: "Framework / Standard", title: "EU AI Act Explorer", url: "https://artificialintelligenceact.eu/", desc: "Navigable breakdown of global risk-tiered AI regulation (prohibited, high-risk, transparency obligations).", tags: ["Regulation", "Policy", "Global"] },
+      { id: "ai-23", category: "ai", aiTrack: "Governance & Risk", type: "Knowledge Base", title: "OECD AI Policy Observatory", url: "https://oecd.ai/", desc: "International AI principles, national policy trackers, and incident/governance metrics for policy and ethics coursework.", tags: ["Ethics", "Policy", "Global"] },
+
+      { id: "ai-24", category: "ai", aiTrack: "Research & Benchmarks", type: "Research / Journal", title: "arXiv — Artificial Intelligence (cs.AI)", url: "https://arxiv.org/list/cs.AI/recent", desc: "Primary preprint archive for cutting-edge AI, LLM, and multi-agent systems papers.", tags: ["Papers", "Preprints", "Academic"] },
+      { id: "ai-25", category: "ai", aiTrack: "Research & Benchmarks", type: "Research / Journal", title: "Hugging Face Daily Papers", url: "https://huggingface.co/papers", desc: "Community-curated daily feed of the most impactful new AI research papers with summaries and code links.", tags: ["Daily Feed", "Curated", "Papers"] },
+      { id: "ai-26", category: "ai", aiTrack: "Research & Benchmarks", type: "Tool / Sandbox", title: "Chatbot Arena (LMArena) Leaderboards", url: "https://lmarena.ai/", desc: "Crowdsourced blind human-preference benchmarks comparing leading proprietary and open-source AI models.", tags: ["Benchmarks", "Evaluation", "Models"] },
+      { id: "ai-27", category: "ai", aiTrack: "Research & Benchmarks", type: "Research / Journal", title: "The Batch (DeepLearning.AI Weekly)", url: "https://www.deeplearning.ai/the-batch/", desc: "Concise weekly briefing summarizing the most important AI research, industry moves, and policy developments.", tags: ["Newsletter", "Weekly", "Trends"] },
+
+      // === UOPX & MIS RESEARCH ===
+      { id: "uopx-1", category: "uopx", type: "Knowledge Base", title: "University of Phoenix Portal & Resources", url: "https://www.phoenix.edu/", desc: "Entry point for student portal, UOPX University Library (peer-reviewed databases like ProQuest/EBSCO), and Writing Center.", tags: ["UOPX", "Library", "APA"] },
+      { id: "uopx-2", category: "uopx", type: "Research / Journal", title: "Association for Information Systems (AIS)", url: "https://aisnet.org/", desc: "Premier global scholarly association for MIS—home to the AIS eLibrary, Senior Scholars' Basket of Journals, and IS curricula.", tags: ["Academic", "MIS Core", "Peer-Reviewed"] },
+      { id: "uopx-3", category: "uopx", type: "Research / Journal", title: "MIS Quarterly (MISQ)", url: "https://misq.umn.edu/", desc: "Top-ranked academic journal in Management Information Systems—gold standard for literature reviews and capstone citations.", tags: ["Journal", "Citations", "Capstone"] },
+      { id: "uopx-4", category: "uopx", type: "Research / Journal", title: "Information Systems Research (ISR)", url: "https://pubsonline.informs.org/journal/isre", desc: "INFORMS flagship journal covering digital transformation, IT economics, analytics, and organizational systems.", tags: ["Journal", "INFORMS", "Research"] },
+      { id: "uopx-5", category: "uopx", type: "Research / Journal", title: "MIT Sloan Management Review", url: "https://sloanreview.mit.edu/", desc: "Research-backed articles translating IT, data strategy, and digital leadership into executive management practice.", tags: ["IT Strategy", "Leadership", "Executive"] },
+      { id: "uopx-6", category: "uopx", type: "Research / Journal", title: "Harvard Business Review — Technology", url: "https://hbr.org/topic/subject/technology", desc: "Case-style perspectives on IT alignment, digital business models, change management, and technology leadership.", tags: ["Business Alignment", "Strategy", "Cases"] },
+      { id: "uopx-7", category: "uopx", type: "Knowledge Base", title: "CIO.com", url: "https://www.cio.com/", desc: "Practical IT executive news covering ERP rollouts, cloud economics, cybersecurity leadership, and enterprise architecture.", tags: ["CIO", "Industry News", "Management"] },
+      { id: "uopx-8", category: "uopx", type: "Knowledge Base", title: "Gartner IT Glossary", url: "https://www.gartner.com/en/information-technology/glossary", desc: "Clear, authoritative definitions of enterprise IT terminology useful for discussion posts and executive summaries.", tags: ["Glossary", "Terminology", "Reference"] },
+
+      // === DATABASES & SQL ===
+      { id: "db-1", category: "databases", type: "Knowledge Base", title: "PostgreSQL Official Documentation", url: "https://www.postgresql.org/docs/", desc: "One of the clearest technical manuals in computing—covers SQL standards, ACID transactions, indexing, and JSONB.", tags: ["RDBMS", "SQL", "Reference"] },
+      { id: "db-2", category: "databases", type: "Knowledge Base", title: "Microsoft SQL Server & T-SQL Docs", url: "https://learn.microsoft.com/en-us/sql/", desc: "Enterprise SQL Server documentation frequently encountered in corporate MIS environments and Windows stacks.", tags: ["SQL Server", "T-SQL", "Enterprise"] },
+      { id: "db-3", category: "databases", type: "Tool / Sandbox", title: "SQLBolt — Interactive SQL Lessons", url: "https://sqlbolt.com/", desc: "Browser-based interactive exercises for mastering SELECTs, JOINs, aggregations, and schema design quickly.", tags: ["Interactive", "SQL", "Practice"] },
+      { id: "db-4", category: "databases", type: "Course / Learning", title: "Mode SQL Tutorial (Business Analytics)", url: "https://mode.com/sql-tutorial/", desc: "SQL taught specifically through business analytics scenarios: window functions, CTEs, cohorts, and KPI queries.", tags: ["Analytics SQL", "CTEs", "Window Functions"] },
+      { id: "db-5", category: "databases", type: "Knowledge Base", title: "Use The Index, Luke!", url: "https://use-the-index-luke.com/", desc: "Deep, accessible guide to B-tree indexes, execution plans, and database performance tuning across major RDBMSs.", tags: ["Indexing", "Performance", "Query Plans"] },
+      { id: "db-6", category: "databases", type: "Knowledge Base", title: "Vertabelo Blog — Data Modeling & ERDs", url: "https://vertabelo.com/blog/", desc: "Practical articles on normalization (1NF–3NF/BCNF), dimensional modeling (star schemas), and real-world ER diagrams.", tags: ["ERD", "Normalization", "Data Modeling"] },
+      { id: "db-7", category: "databases", type: "Knowledge Base", title: "dbt Documentation (Analytics Engineering)", url: "https://docs.getdbt.com/", desc: "Modern cloud data warehousing transformation best practices, data testing, lineage, and modular SQL.", tags: ["Data Warehouse", "ELT", "Modern Data Stack"] },
+      { id: "db-8", category: "databases", type: "Knowledge Base", title: "MongoDB Documentation & University", url: "https://www.mongodb.com/docs/", desc: "Primary reference for document-oriented NoSQL data modeling, aggregation pipelines, and schema trade-offs.", tags: ["NoSQL", "Document DB", "JSON"] },
+
+      // === BI, ANALYTICS & VIZ ===
+      { id: "bi-1", category: "bi", type: "Knowledge Base", title: "Microsoft Power BI Documentation", url: "https://learn.microsoft.com/en-us/power-bi/", desc: "Official learning paths and DAX/Power Query references for the most widely deployed corporate BI tool.", tags: ["Power BI", "DAX", "Dashboards"] },
+      { id: "bi-2", category: "bi", type: "Knowledge Base", title: "Tableau Help & Learning", url: "https://help.tableau.com/", desc: "Visual analytics guides, calculated fields, dashboard design, and enterprise data governance in Tableau.", tags: ["Tableau", "Visualization", "BI"] },
+      { id: "bi-3", category: "bi", type: "Tool / Sandbox", title: "Kaggle Datasets & Micro-Courses", url: "https://www.kaggle.com/", desc: "Thousands of real-world datasets and free notebooks for practicing EDA, SQL, Python, and ML projects.", tags: ["Datasets", "Notebooks", "Practice"] },
+      { id: "bi-4", category: "bi", type: "Tool / Sandbox", title: "Data.gov Open Data Catalog", url: "https://data.gov/", desc: "Authoritative U.S. public datasets ideal for MIS analytics assignments, BI dashboards, and capstone projects.", tags: ["Public Data", "Capstone", "Research"] },
+      { id: "bi-5", category: "bi", type: "Knowledge Base", title: "Storytelling with Data", url: "https://www.storytellingwithdata.com/", desc: "Best practices for choosing the right chart, eliminating clutter, and presenting data persuasively to executives.", tags: ["Executive Comms", "Chart Design", "BI"] },
+      { id: "bi-6", category: "bi", type: "Knowledge Base", title: "Looker Studio Help Center", url: "https://support.google.com/looker-studio/", desc: "Free cloud dashboarding and reporting documentation for connecting spreadsheets, SQL, and BigQuery.", tags: ["Google", "Reporting", "Free BI"] },
+
+      // === SYSTEMS ANALYSIS, DESIGN & PM ===
+      { id: "pm-1", category: "sad-pm", type: "Framework / Standard", title: "Project Management Institute (PMI)", url: "https://www.pmi.org/", desc: "Home of the PMBOK Guide, PMP/CAPM certifications, scope/schedule/cost templates, and IT project governance.", tags: ["PMBOK", "PMP", "Project Mgmt"] },
+      { id: "pm-2", category: "sad-pm", type: "Framework / Standard", title: "The Official Scrum Guide", url: "https://scrumguides.org/", desc: "Concise, authoritative 14-page specification of Scrum roles, artifacts, and sprint events.", tags: ["Agile", "Scrum", "SDLC"] },
+      { id: "pm-3", category: "sad-pm", type: "Knowledge Base", title: "Atlassian Agile Coach", url: "https://www.atlassian.com/agile", desc: "Practical playbooks for Kanban, Scrum, user stories, backlog prioritization, and DevOps delivery.", tags: ["Agile", "Kanban", "User Stories"] },
+      { id: "pm-4", category: "sad-pm", type: "Framework / Standard", title: "IIBA — Business Analysis (BABOK)", url: "https://www.iiba.org/", desc: "Requirements elicitation, stakeholder analysis, business process modeling, and solution evaluation standards.", tags: ["Business Analysis", "Requirements", "BABOK"] },
+      { id: "pm-5", category: "sad-pm", type: "Knowledge Base", title: "UML Diagrams Reference", url: "https://www.uml-diagrams.org/", desc: "Clear notation guide for Use Case, Class, Sequence, Activity, and Component diagrams in Systems Analysis & Design.", tags: ["UML", "SAD", "Diagrams"] },
+      { id: "pm-6", category: "sad-pm", type: "Tool / Sandbox", title: "Mermaid Live Editor", url: "https://mermaid.live/", desc: "Create ERDs, sequence diagrams, Gantt charts, and flowcharts from simple text—fast to export for papers.", tags: ["Diagrams", "ERD", "Gantt"] },
+      { id: "pm-7", category: "sad-pm", type: "Framework / Standard", title: "C4 Model for Software Architecture", url: "https://c4model.com/", desc: "Clean 4-level approach (Context, Container, Component, Code) to communicate technical architectures to business stakeholders.", tags: ["Architecture", "Diagrams", "Communication"] },
+
+      // === ENTERPRISE SYSTEMS & CLOUD ===
+      { id: "ent-1", category: "enterprise", type: "Framework / Standard", title: "AWS Well-Architected Framework", url: "https://aws.amazon.com/architecture/well-architected/", desc: "Six pillars of cloud excellence: operational excellence, security, reliability, performance, cost optimization, and sustainability.", tags: ["AWS", "Cloud", "Architecture"] },
+      { id: "ent-2", category: "enterprise", type: "Knowledge Base", title: "Microsoft Azure Architecture Center", url: "https://learn.microsoft.com/en-us/azure/architecture/", desc: "Reference architectures, cloud design patterns, hybrid enterprise integration, and AI workload blueprints.", tags: ["Azure", "Patterns", "Enterprise"] },
+      { id: "ent-3", category: "enterprise", type: "Knowledge Base", title: "Google Cloud Architecture Center", url: "https://cloud.google.com/architecture", desc: "Reference guides for data lakes, BigQuery analytics, Kubernetes, and enterprise AI infrastructure.", tags: ["GCP", "Data Platform", "Cloud"] },
+      { id: "ent-4", category: "enterprise", type: "Course / Learning", title: "SAP Learning Portal", url: "https://learning.sap.com/", desc: "Free learning journeys covering ERP fundamentals, S/4HANA, supply chain, and enterprise business processes.", tags: ["ERP", "SAP", "Business Processes"] },
+      { id: "ent-5", category: "enterprise", type: "Course / Learning", title: "Salesforce Trailhead", url: "https://trailhead.salesforce.com/", desc: "Gamified hands-on modules for CRM administration, workflow automation, data modeling, and enterprise platforms.", tags: ["CRM", "Low-Code", "Hands-On"] },
+      { id: "ent-6", category: "enterprise", type: "Framework / Standard", title: "The Open Group — TOGAF Standard", url: "https://www.opengroup.org/togaf", desc: "Enterprise Architecture methodology (ADM) aligning business, data, application, and technology architectures.", tags: ["Enterprise Architecture", "TOGAF", "Governance"] },
+      { id: "ent-7", category: "enterprise", type: "Knowledge Base", title: "Cloudflare Learning Center", url: "https://www.cloudflare.com/learning/", desc: "Crystal-clear explanations of DNS, TCP/IP, HTTP, CDNs, DDoS, and Zero Trust networking.", tags: ["Networking", "Zero Trust", "Infrastructure"] },
+      { id: "ent-8", category: "enterprise", type: "Knowledge Base", title: "System Design Primer (GitHub)", url: "https://github.com/donnemartin/system-design-primer", desc: "Widely cited guide to scalability, load balancing, caching, sharding, and distributed system trade-offs.", tags: ["Scalability", "Architecture", "Distributed"] },
+
+      // === CYBERSECURITY & GRC ===
+      { id: "sec-1", category: "security", type: "Framework / Standard", title: "NIST Cybersecurity Framework (CSF 2.0)", url: "https://www.nist.gov/cyberframework", desc: "Cornerstone framework (Govern, Identify, Protect, Detect, Respond, Recover) for enterprise cybersecurity management.", tags: ["NIST", "GRC", "Risk"] },
+      { id: "sec-2", category: "security", type: "Framework / Standard", title: "NIST CSRC (SP 800 Series)", url: "https://csrc.nist.gov/", desc: "Home of SP 800-53 security controls, SP 800-30 risk assessment, and incident response guidelines.", tags: ["Controls", "Compliance", "Standards"] },
+      { id: "sec-3", category: "security", type: "Framework / Standard", title: "ISACA (COBIT, CISA, CISM)", url: "https://www.isaca.org/", desc: "Leading authority on IT governance (COBIT), IT audit, risk management, and information security leadership.", tags: ["COBIT", "IT Governance", "Audit"] },
+      { id: "sec-4", category: "security", type: "Knowledge Base", title: "OWASP Foundation & Cheat Sheets", url: "https://owasp.org/", desc: "Open web and API application security standards, threat modeling guides, and developer security checklists.", tags: ["AppSec", "OWASP", "Threat Modeling"] },
+      { id: "sec-5", category: "security", type: "Knowledge Base", title: "MITRE ATT&CK Framework", url: "https://attack.mitre.org/", desc: "Globally accessible knowledge base of real-world adversary tactics, techniques, and mitigations.", tags: ["Threat Intel", "SOC", "Defense"] },
+      { id: "sec-6", category: "security", type: "Knowledge Base", title: "CISA Advisories & Frameworks", url: "https://www.cisa.gov/", desc: "U.S. Cybersecurity & Infrastructure Security Agency alerts, Zero Trust Maturity Model, and ransomware guidance.", tags: ["Zero Trust", "Advisories", "CISA"] },
+      { id: "sec-7", category: "security", type: "Research / Journal", title: "SANS Reading Room & Whitepapers", url: "https://www.sans.org/white-papers/", desc: "Thousands of practical, peer-reviewed security research papers across governance, forensics, and cloud security.", tags: ["Whitepapers", "Security", "Research"] },
+
+      // === PROGRAMMING & APIS ===
+      { id: "dev-1", category: "dev", type: "Knowledge Base", title: "Python Official Documentation", url: "https://docs.python.org/3/", desc: "Primary reference for Python—the lingua franca of business automation, data analysis, and AI engineering.", tags: ["Python", "Automation", "Reference"] },
+      { id: "dev-2", category: "dev", type: "Course / Learning", title: "Automate the Boring Stuff with Python", url: "https://automatetheboringstuff.com/", desc: "Free online book focused on practical office/MIS automation: Excel, PDFs, CSVs, web scraping, and emails.", tags: ["Python", "Excel", "Free Book"] },
+      { id: "dev-3", category: "dev", type: "Knowledge Base", title: "MDN Web Docs", url: "https://developer.mozilla.org/", desc: "Gold-standard documentation for HTML, CSS, JavaScript, HTTP, and modern web APIs.", tags: ["Web Dev", "JavaScript", "HTTP"] },
+      { id: "dev-4", category: "dev", type: "Course / Learning", title: "Postman Learning Center", url: "https://learning.postman.com/", desc: "Guides and interactive workspaces for understanding, testing, and documenting REST/GraphQL APIs.", tags: ["APIs", "REST", "Integration"] },
+      { id: "dev-5", category: "dev", type: "Knowledge Base", title: "Pro Git Book & Documentation", url: "https://git-scm.com/doc", desc: "Complete free book on Git version control, branching workflows, and collaborative software delivery.", tags: ["Git", "DevOps", "Workflow"] },
+      { id: "dev-6", category: "dev", type: "Knowledge Base", title: "roadmap.sh — Tech & Career Roadmaps", url: "https://roadmap.sh/", desc: "Visual step-by-step skill trees for Data Analysts, AI Engineers, Cyber Security, DevOps, and Software Architects.", tags: ["Careers", "Skill Trees", "Planning"] }
+    ];
+
+    // State
+    let state = {
+      view: "all", // "all" | "bookmarks" | categoryId
+      aiTrack: "All AI",
+      typeFilter: "all",
+      search: "",
+      customResources: [],
+      bookmarks: new Set(),
+      notes: {},
+      openNotes: new Set()
+    };
+
+    function loadState() {
+      try {
+        const c = JSON.parse(localStorage.getItem(STORAGE_KEYS.custom) || "[]");
+        if (Array.isArray(c)) state.customResources = c;
+        const b = JSON.parse(localStorage.getItem(STORAGE_KEYS.bookmarks) || "[]");
+        if (Array.isArray(b)) state.bookmarks = new Set(b);
+        const n = JSON.parse(localStorage.getItem(STORAGE_KEYS.notes) || "{}");
+        if (n && typeof n === "object") state.notes = n;
+        const theme = localStorage.getItem(STORAGE_KEYS.theme) || "dark";
+        applyTheme(theme);
+      } catch (e) {
+        console.warn("Could not load localStorage state:", e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.custom, JSON.stringify(state.customResources));
+        localStorage.setItem(STORAGE_KEYS.bookmarks, JSON.stringify([...state.bookmarks]));
+        localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(state.notes));
+      } catch (e) {
+        console.warn("Could not persist localStorage state:", e);
+      }
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem(STORAGE_KEYS.theme, theme);
+      document.getElementById("themeBtn").textContent = theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getAllResources() {
+      return [...state.customResources, ...SEED_RESOURCES];
+    }
+
+    function getCategoryMeta(id) {
+      return CATEGORIES.find(c => c.id === id);
+    }
+
+    function getFilteredResources() {
+      const q = state.search.trim().toLowerCase();
+      return getAllResources().filter(item => {
+        if (state.view === "bookmarks" && !state.bookmarks.has(item.id)) return false;
+        if (state.view !== "all" && state.view !== "bookmarks" && item.category !== state.view) return false;
+        if (state.view === "ai" && state.aiTrack !== "All AI" && item.aiTrack !== state.aiTrack) return false;
+        if (state.typeFilter !== "all" && item.type !== state.typeFilter) return false;
+        if (q) {
+          const note = (state.notes[item.id] || "").toLowerCase();
+          const haystack = [
+            item.title,
+            item.desc,
+            item.type,
+            item.aiTrack || "",
+            ...(item.tags || []),
+            note
+          ].join(" ").toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderSidebar() {
+      const all = getAllResources();
+      const quickNav = document.getElementById("quickNav");
+      quickNav.innerHTML = `
+        <button class="nav-btn ${state.view === "all" ? "active" : ""}" data-view="all">
+          <span class="nav-label">🌐 All Resources</span>
+          <span class="badge-count">${all.length}</span>
+        </button>
+        <button class="nav-btn ${state.view === "bookmarks" ? "active" : ""}" data-view="bookmarks">
+          <span class="nav-label">⭐ Starred / Bookmarks</span>
+          <span class="badge-count">${state.bookmarks.size}</span>
+        </button>
+      `;
+
+      const catNav = document.getElementById("categoryNav");
+      catNav.innerHTML = CATEGORIES.map(cat => {
+        const count = all.filter(r => r.category === cat.id).length;
+        const active = state.view === cat.id ? "active" : "";
+        const feat = cat.featured ? "ai-featured" : "";
+        const pill = cat.featured ? `<span class="ai-pill">DEEP</span>` : "";
+        return `
+          <button class="nav-btn ${active} ${feat}" data-view="${cat.id}">
+            <span class="nav-label">${cat.icon} ${escapeHtml(cat.name)} ${pill}</span>
+            <span class="badge-count">${count}</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function renderHeaderAndChips(filteredCount) {
+      const header = document.getElementById("sectionHeader");
+      const titleEl = document.getElementById("sectionTitle");
+      const descEl = document.getElementById("sectionDesc");
+      const chipBar = document.getElementById("aiTrackBar");
+      const countEl = document.getElementById("resultCount");
+
+      header.classList.toggle("ai-banner", state.view === "ai");
+      countEl.textContent = `${filteredCount} resource${filteredCount === 1 ? "" : "s"}`;
+
+      if (state.view === "all") {
+        titleEl.textContent = "All MIS & AI Knowledge Sources";
+        descEl.textContent = "Curated knowledge bases, frameworks, datasets, journals, and AI hubs aligned with a University of Phoenix MIS program.";
+      } else if (state.view === "bookmarks") {
+        titleEl.textContent = "⭐ Starred & Bookmarked Resources";
+        descEl.textContent = "Your pinned go-to references for current classes, discussion posts, and projects.";
+      } else {
+        const cat = getCategoryMeta(state.view);
+        titleEl.textContent = `${cat.icon} ${cat.name}`;
+        descEl.textContent = cat.desc;
+      }
+
+      if (state.view === "ai") {
+        chipBar.style.display = "flex";
+        chipBar.innerHTML = AI_TRACKS.map(track => `
+          <button class="chip ${state.aiTrack === track ? "active" : ""}" data-track="${escapeHtml(track)}">
+            ${escapeHtml(track)}
+          </button>
+        `).join("");
+      } else {
+        chipBar.style.display = "none";
+      }
+    }
+
+    function renderCards() {
+      const items = getFilteredResources();
+      renderHeaderAndChips(items.length);
+
+      const grid = document.getElementById("cardsGrid");
+      if (!items.length) {
+        grid.innerHTML = `
+          <div class="empty" style="grid-column: 1 / -1;">
+            <h3>No matching resources found</h3>
+            <p style="margin-top:6px;">Try clearing your search filter, switching resource type, or adding your own link with "+ Add Resource".</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = items.map(item => {
+        const cat = getCategoryMeta(item.category);
+        const isAi = item.category === "ai";
+        const starred = state.bookmarks.has(item.id);
+        const noteText = state.notes[item.id] || "";
+        const hasNote = noteText.trim().length > 0;
+        const noteOpen = state.openNotes.has(item.id);
+        const isCustom = String(item.id).startsWith("custom-");
+
+        return `
+          <article class="card ${isAi ? "is-ai" : ""}" data-id="${escapeHtml(item.id)}">
+            <div class="card-top">
+              <div class="card-badges">
+                <span class="tag ${isAi ? "ai" : ""}">${cat ? escapeHtml(cat.name) : "Resource"}</span>
+                ${item.aiTrack ? `<span class="tag ai">${escapeHtml(item.aiTrack)}</span>` : ""}
+                <span class="tag neutral">${escapeHtml(item.type)}</span>
+              </div>
+              <button class="icon-btn ${starred ? "starred" : ""}" data-action="star" title="Bookmark">
+                ${starred ? "★" : "☆"}
+              </button>
+            </div>
+
+            <a class="card-title" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+              ${escapeHtml(item.title)}
+            </a>
+
+            <p class="card-desc">${escapeHtml(item.desc)}</p>
+
+            <div class="card-meta">
+              ${(item.tags || []).map(t => `<span class="mini-tag">#${escapeHtml(t)}</span>`).join("")}
+            </div>
+
+            <div class="card-actions">
+              <a class="open-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+                Open Resource ↗
+              </a>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-sm btn-ghost" data-action="toggle-note">
+                  📝 ${hasNote ? "Notes (1)" : "Notes"}
+                </button>
+                ${isCustom ? `<button class="btn btn-sm btn-ghost" data-action="delete" style="color:var(--danger);">Delete</button>` : ""}
+              </div>
+            </div>
+
+            <div class="note-box ${noteOpen ? "open" : ""}">
+              <textarea class="note-area" data-action="edit-note" placeholder="Add UOPX course notes, APA citation reminders, or key takeaways...">${escapeHtml(noteText)}</textarea>
+              <span class="note-hint">Auto-saved locally in this browser</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderAll() {
+      renderSidebar();
+      renderCards();
+    }
+
+    function populateCategorySelect() {
+      const sel = document.getElementById("fCategory");
+      sel.innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+    }
+
+    // Event wiring
+    document.addEventListener("click", (e) => {
+      const navBtn = e.target.closest(".nav-btn");
+      if (navBtn) {
+        state.view = navBtn.dataset.view;
+        state.aiTrack = "All AI";
+        renderAll();
+        return;
+      }
+
+      const chip = e.target.closest(".chip");
+      if (chip) {
+        state.aiTrack = chip.dataset.track;
+        renderCards();
+        return;
+      }
+
+      const card = e.target.closest(".card");
+      const actionBtn = e.target.closest("[data-action]");
+      if (card && actionBtn) {
+        const id = card.dataset.id;
+        const action = actionBtn.dataset.action;
+
+        if (action === "star") {
+          if (state.bookmarks.has(id)) state.bookmarks.delete(id);
+          else state.bookmarks.add(id);
+          saveState();
+          renderAll();
+        } else if (action === "toggle-note") {
+          if (state.openNotes.has(id)) state.openNotes.delete(id);
+          else state.openNotes.add(id);
+          renderCards();
+        } else if (action === "delete") {
+          if (confirm("Delete this custom resource?")) {
+            state.customResources = state.customResources.filter(r => r.id !== id);
+            state.bookmarks.delete(id);
+            delete state.notes[id];
+            saveState();
+            renderAll();
+          }
+        }
+      }
+    });
+
+    document.addEventListener("input", (e) => {
+      if (e.target.id === "searchInput") {
+        state.search = e.target.value;
+        renderCards();
+      } else if (e.target.dataset.action === "edit-note") {
+        const card = e.target.closest(".card");
+        if (card) {
+          state.notes[card.dataset.id] = e.target.value;
+          saveState();
+        }
+      }
+    });
+
+    document.getElementById("typeFilter").addEventListener("change", (e) => {
+      state.typeFilter = e.target.value;
+      renderCards();
+    });
+
+    document.getElementById("themeBtn").addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      applyTheme(cur === "dark" ? "light" : "dark");
+    });
+
+    // Modal handling
+    const backdrop = document.getElementById("modalBackdrop");
+    const fCategory = document.getElementById("fCategory");
+    const fAiTrackWrap = document.getElementById("fAiTrackWrap");
+
+    function syncAiTrackVisibility() {
+      fAiTrackWrap.style.display = fCategory.value === "ai" ? "flex" : "none";
+    }
+    fCategory.addEventListener("change", syncAiTrackVisibility);
+
+    document.getElementById("addBtn").addEventListener("click", () => {
+      if (state.view !== "all" && state.view !== "bookmarks") {
+        fCategory.value = state.view;
+      }
+      syncAiTrackVisibility();
+      backdrop.classList.add("open");
+      document.getElementById("fTitle").focus();
+    });
+
+    document.getElementById("cancelModal").addEventListener("click", () => backdrop.classList.remove("open"));
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) backdrop.classList.remove("open"); });
+
+    document.getElementById("addForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const cat = fCategory.value;
+      const tagsRaw = document.getElementById("fTags").value;
+      const newRes = {
+        id: "custom-" + Date.now(),
+        category: cat,
+        aiTrack: cat === "ai" ? document.getElementById("fAiTrack").value : undefined,
+        type: document.getElementById("fType").value,
+        title: document.getElementById("fTitle").value.trim(),
+        url: document.getElementById("fUrl").value.trim(),
+        desc: document.getElementById("fDesc").value.trim() || "Custom saved resource.",
+        tags: tagsRaw ? tagsRaw.split(",").map(s => s.trim()).filter(Boolean) : ["Custom"]
+      };
+      state.customResources.unshift(newRes);
+      saveState();
+      e.target.reset();
+      backdrop.classList.remove("open");
+      renderAll();
+    });
+
+    // Export / Import JSON backup
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        customResources: state.customResources,
+        bookmarks: [...state.bookmarks],
+        notes: state.notes
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mis-portal-backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("importInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (Array.isArray(data.customResources)) state.customResources = data.customResources;
+          if (Array.isArray(data.bookmarks)) state.bookmarks = new Set(data.bookmarks);
+          if (data.notes && typeof data.notes === "object") state.notes = data.notes;
+          saveState();
+          renderAll();
+          alert("Backup imported successfully!");
+        } catch {
+          alert("Invalid backup JSON file.");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    });
+
+    populateCategorySelect();
+    loadState();
+    renderAll();
+  </script>
+</body>
+</html>
