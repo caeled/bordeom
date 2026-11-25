@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spectrum Search &mdash; loading&hellip;</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+         margin: 0; min-height: 100vh; display: flex; align-items: center;
+         justify-content: center; background: #101418; color: #e8ecef; }
+  .card { max-width: 34rem; margin: 1rem; padding: 1.75rem 2rem;
+          background: #171d23; border: 1px solid #2b333c; border-radius: 12px; }
+  h1 { font-size: 1.35rem; margin: 0 0 .5rem; }
+  #status { font-size: 1.05rem; margin: .75rem 0 .25rem; }
+  #detail { color: #a7b0ba; line-height: 1.45; margin: .25rem 0 1rem; }
+  button { font: inherit; padding: .55rem 1rem; border-radius: 8px;
+           border: 1px solid #4a5561; background: #222a32; color: #e8ecef;
+           cursor: pointer; }
+  button:hover { background: #2b353f; }
+  .fine { color: #77828d; font-size: .85rem; margin-top: 1.25rem; line-height: 1.4; }
+  a { color: #8fc3f0; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Spectrum Search</h1>
+  <p id="status" aria-live="polite">Trying to load latest build from GitHub&hellip;</p>
+  <p id="detail">Checking whether the live build on GitHub answers. If it
+     doesn&rsquo;t answer within a few seconds, this page loads the reference
+     copy kept on this server instead &mdash; same workshop, slightly older
+     snapshot.</p>
+  <button id="localBtn" type="button">Use the local copy now</button>
+  <p class="fine">Nothing is tracked and nothing is uploaded. This page only
+     points your browser at one copy or the other.</p>
+  <noscript>
+    <p><strong>JavaScript is off, so this page can&rsquo;t choose for you.
+       Pick a copy yourself:</strong></p>
+    <p><a href="https://caeled.github.io/mis-classmate-portal/SpectrumSearch.html">Latest build on GitHub</a> &mdash; the live
+       version, when the internet is behaving.</p>
+    <p><a href="SpectrumSearch-reference.html">Reference copy on this server</a> &mdash;
+       Reference copy on this server — a snapshot; the live build is the one on GitHub.</p>
+  </noscript>
+</main>
+
+<script>
+/* =====================================================================
+   CONFIG — the only block you ever need to edit.
+   ONLINE_URL : the live build on GitHub Pages (tried first).
+   LOCAL_URL  : the reference copy sitting beside this file on this server.
+   SITE_NAME  : the name shown at the top of the page.
+   LOCAL_LABEL: one plain sentence saying what the local copy is.
+   LOCAL_DATE : the date the reference copy was last refreshed
+                (e.g. "2026-11-24"). Update it whenever you save a fresh
+                reference copy next to this file, so a stale snapshot
+                never pretends to be fresh. Leave blank if undated.
+   TIMEOUT_MS : how long to wait for GitHub before falling back (6000 = 6 s).
+   ===================================================================== */
+var CONFIG = {
+  SITE_NAME:   "Spectrum Search",
+  ONLINE_URL:  "https://caeled.github.io/mis-classmate-portal/SpectrumSearch.html",
+  LOCAL_URL:   "SpectrumSearch-reference.html",
+  LOCAL_LABEL: "Reference copy on this server — a snapshot; the live build is the one on GitHub.",
+  LOCAL_DATE:  "",
+  TIMEOUT_MS:  6000
+};
+
+/* ---------- pass-through: the loader's own ?query and #hash ride along
+   to whichever copy wins. The loader's own "local" flag is consumed here
+   and is NOT forwarded. ---------- */
+function passthrough() {
+  var q = new URLSearchParams(window.location.search);
+  q.delete("local");
+  var s = q.toString();
+  return (s ? "?" + s : "") + window.location.hash;
+}
+function joinUrl(base, extra) {
+  if (!extra) return base;
+  var hashIdx = extra.indexOf("#");
+  var query = hashIdx >= 0 ? extra.slice(0, hashIdx) : extra;
+  var hash  = hashIdx >= 0 ? extra.slice(hashIdx) : "";
+  var out = base;
+  if (query) out += (base.indexOf("?") >= 0 ? "&" : "?") + query.slice(1);
+  return out + hash;
+}
+
+var statusEl = document.getElementById("status");
+var detailEl = document.getElementById("detail");
+var decided  = false;
+
+function goOnline() {
+  if (decided) return; decided = true;
+  window.location.replace(joinUrl(CONFIG.ONLINE_URL, passthrough()));
+}
+
+function goLocal(beatMs) {
+  if (decided) return; decided = true;
+  statusEl.textContent = "Loading Reference copy";
+  var label = CONFIG.LOCAL_LABEL;
+  if (CONFIG.LOCAL_DATE) label += " Snapshot taken " + CONFIG.LOCAL_DATE + ".";
+  detailEl.textContent = label;
+  setTimeout(function () {
+    window.location.replace(joinUrl(CONFIG.LOCAL_URL, passthrough()));
+  }, beatMs);
+}
+
+/* Reachability probe. mode:"no-cors" means the promise resolves if the
+   server answers at all (we cannot read the answer cross-origin, and we
+   don't need to — answering is the whole question). It rejects on a
+   network failure, and the timer covers a server that never answers. */
+function probe(url, timeoutMs) {
+  return new Promise(function (resolve) {
+    var done = false;
+    var timer = setTimeout(function () {
+      if (!done) { done = true; resolve(false); }
+    }, timeoutMs);
+    try {
+      fetch(url, { mode: "no-cors", cache: "no-store" }).then(function () {
+        if (!done) { done = true; clearTimeout(timer); resolve(true); }
+      }, function () {
+        if (!done) { done = true; clearTimeout(timer); resolve(false); }
+      });
+    } catch (e) {
+      if (!done) { done = true; clearTimeout(timer); resolve(false); }
+    }
+  });
+}
+
+document.getElementById("localBtn").addEventListener("click", function () {
+  goLocal(150);
+});
+
+/* ?local in the loader's own address forces the reference copy at once. */
+if (new URLSearchParams(window.location.search).has("local")) {
+  goLocal(150);
+} else {
+  probe(CONFIG.ONLINE_URL, CONFIG.TIMEOUT_MS).then(function (ok) {
+    if (ok) { goOnline(); } else { goLocal(600); }
+  });
+}
+</script>
+</body>
+</html>
